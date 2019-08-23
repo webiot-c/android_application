@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AEDInformationAdapter extends BaseAdapter {
 
@@ -51,7 +52,12 @@ public class AEDInformationAdapter extends BaseAdapter {
         AEDInformation aed = aeds.get(position);
         ((TextView)convertView.findViewById(R.id.adeid)).setText(aed.getAed_id());
 
-        String location = "緯度: " + aed.getLatitude() + "／ 経度: " + aed.getLongitude();
+        String location = String.format(Locale.getDefault(),
+                context.getString(R.string.latitude) + " ／  " + context.getString(R.string.longitude),
+                aed.getLatitude(),
+                aed.getLongitude()
+        );
+
         ((TextView)convertView.findViewById(R.id.loc)).setText(location);
 
         return convertView;

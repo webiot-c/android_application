@@ -3,4 +3,14 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="mainbackcolor">#AA0000</color>
+    <color name="mainforecolor">#CFCFCF</color>
+
+    <color name="noaedinfo">#77FF77</color>
+    <color name="noaedinfo_fore">@android:color/primary_text_light</color>
+
+    <color name="aed_enabled">@color/mainbackcolor</color>
+    <color name="aed_enabled_fore">@color/mainforecolor</color>
+
 </resources>

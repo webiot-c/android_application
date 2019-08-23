@@ -1,6 +1,7 @@
 package com.webiot_c.cprss_notifi_recv;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
@@ -272,8 +273,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onLocationChanged(Location location){
         currentLocation = location;
-        lat.setText("緯度: " + currentLocation.getLatitude());
-        lon.setText("経度: " + currentLocation.getLongitude());
+        lat.setText(String.format(getString(R.string.latitude), currentLocation.getLatitude()));
+        lon.setText(String.format(getString(R.string.longitude), currentLocation.getLongitude()));
     }
 
     /**
@@ -286,16 +287,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onStatusChanged(String provider, int service_st, Bundle extras) {
         switch (service_st) {
             case LocationProvider.AVAILABLE:
-                status.setText("位置情報を利用できます。");
+                status.setText("");
                 break;
             case LocationProvider.OUT_OF_SERVICE:
-                status.setText("圏外です。");
+                status.setText(R.string.locservice_outofservice);
                 break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                status.setText("一時的に利用できません。");
+                status.setText(R.string.locservice_temp);
                 break;
             default:
-                status.setText("ステータスが不明です。");
+                status.setText(R.string.locservice_unknown);
                 break;
         }
     }
@@ -306,11 +307,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
      */
     @Override
     public void onProviderDisabled(String provider){
-
         notify(NOTIFICATION_CHANNEL_LOCATION
                 ,android.R.drawable.ic_dialog_info,
-                "位置情報サービスが無効になりました。",
-                "位置情報サービスが無効の状態だと、通知を受け取れません。\n位置情報サービスの有効化にご協力ください。");
+                getString(R.string.notify_locservice_disable),
+                getString(R.string.notify_locservice_disabled_detail));
     }
 
     /**
@@ -321,8 +321,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onProviderEnabled(String provider){
         notify(  NOTIFICATION_CHANNEL_LOCATION,
                  android.R.drawable.ic_dialog_info,
-                "位置情報サービスが有効になりました。",
-                "ご協力ありがとうございます。");
+                getString(R.string.notify_locservice_enabled),
+                getString(R.string.notify_locservice_enabled_detail));
     }
 
     // ----- 通知 ----- //
@@ -419,12 +419,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 if(retryCount > 10){
                     virtual_this.notify(NOTIFICATION_CHANNEL_SERVER,
                             android.R.drawable.ic_dialog_info,
-                            "サーバーとの接続が切断されました。",
-                            "あらゆる通知が受信できません。接続の復帰にご協力ください。",
-                            "あらゆる通知が受信できません。接続の復帰にご協力ください。\n" +
-                                    "サーバー側の問題である可能性がある場合は、開発者にご連絡ください。");
-                    retryCount = 0;
-                    interval += 1;
+                            getString(R.string.notify_disconnected),
+                            getString(R.string.notify_disconnection_detail),
+                            getString(R.string.notify_disconnection_detail) + "\n" +
+                                    getString(R.string.notify_disconnected_context)
+                            retryCount = 0;
+                            interval += 1;
+                    );
                 }
                 try{
                     Thread.sleep(5000 + (1000 * 60 * interval));
@@ -463,11 +464,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         notify(NOTIFICATION_CHANNEL_AED_START,
                 android.R.drawable.ic_dialog_info,
-                "AED使用が開始されました。人命救助の応援が必要な可能性があります。",
-                "タップして場所を確認してください。",
-                "設定した範囲内で、人命救助の応援を必要としている人がいます。\n" +
-                         "応援にご協力ください。\n" +
-                         "位置をタップして確認してください。");
+                getString(R.string.notify_aed_open),
+                getString(R.string.notify_aed_open_detail),
+                getString(R.string.notify_aed_open_context));
 
         dbhelper.saveData(aedInfo);
 
@@ -483,11 +482,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onAEDUseFinished(AEDInformation aedInfo) {
         notify(NOTIFICATION_CHANNEL_AED_FINISH,
                 android.R.drawable.ic_dialog_info,
-                "AED使用が終了しました。",
-                "これ以上応援は必要ないと思われます。ご協力ありがとうございました。");
-
+                getString(R.string.notify_aed_close),
+                getString(R.string.notify_aed_close_detail));
         dbhelper.deleteData(aedInfo.getAed_id());
-
         updateAEDList();
 
     }
