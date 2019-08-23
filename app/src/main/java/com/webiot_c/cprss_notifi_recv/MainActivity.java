@@ -423,9 +423,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                             getString(R.string.notify_disconnection_detail),
                             getString(R.string.notify_disconnection_detail) + "\n" +
                                     getString(R.string.notify_disconnected_context)
-                            retryCount = 0;
-                            interval += 1;
                     );
+                    retryCount = 0;
+                    interval += 1;
                 }
                 try{
                     Thread.sleep(5000 + (1000 * 60 * interval));
