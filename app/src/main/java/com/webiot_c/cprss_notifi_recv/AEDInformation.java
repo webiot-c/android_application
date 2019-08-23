@@ -1,5 +1,11 @@
 package com.webiot_c.cprss_notifi_recv;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.widget.ArrayAdapter;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 public class AEDInformation {
@@ -25,26 +31,16 @@ public class AEDInformation {
         return lat;
     }
 
-    public void setLatitude(int lat) {
-        this.lat = lat;
-    }
-
     public double getLongitude() {
         return lon;
-    }
-
-    public void setLongitude(int lon) {
-        this.lon = lon;
-    }
-
-    public void setLocation(int latitude, int longitude){
-        this.lat = latitude;
-        this.lon = longitude;
     }
 
     public long getUniqueID(){
         return unique_id;
     }
 
+    public String toString(){
+        return String.format("{AEDInformation: aedid: %s, lat: %f, lon: %f}", aed_id, lat, lon);
+    }
 
 }

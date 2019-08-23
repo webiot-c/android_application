@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,24 +18,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.Math.sin;
-import static java.lang.Math.cos;
-import static java.lang.Math.tan;
-import static java.lang.Math.acos;
+import java.util.Arrays;
 
 /**
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
@@ -42,24 +35,28 @@ import static java.lang.Math.acos;
  */
 public class MainActivity extends AppCompatActivity implements LocationListener, CPRSS_WebSocketClientListener {
 
-    private LocationManager locMan;
-    private String bestProvider;
+    ////////////////////
+    ///// 定数たち /////
+    ////////////////////
 
-    private Handler handler;
-
-    private Location currentLocation;
-
-    private TextView status, lon, lat, ade_lon, ade_lat;
-    private Button invoke, close;
-
-    private CPRSS_WebSocketClient wsclient;
-
-    private ArrayList<AEDInformation> aed_infos;
-    private AEDInformationAdapter adapter;
-
+    /**
+     * 位置情報サービスに関する通知チャンネル。
+     */
     private static final String NOTIFICATION_CHANNEL_LOCATION   = "cprss_notifychan_loc";
+
+    /**
+     * AED使用開始に関する通知チャンネル。
+     */
     private static final String NOTIFICATION_CHANNEL_AED_START  = "cprss_notifychan_aedst";
+
+    /**
+     * AED使用終了に関する通知チャンネル。
+     */
     private static final String NOTIFICATION_CHANNEL_AED_FINISH = "cprss_notifychan_aedfn";
+
+    /**
+     * サーバーとの接続に関する通知チャンネル。
+     */
     private static final String NOTIFICATION_CHANNEL_SERVER = "cprss_notifychan_svr";
 
     /**
@@ -67,15 +64,82 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
      *  重要度は、レベルに応じて 1～4を選択する。
      */
     private static final Object[][] NOTIFICATION_CHANNEL_INFORMATIONS = {
-        {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_LOCATION   , "位置情報サービス関連の通知", "位置情報サービスの状態に変化が発生したときに通知されます。"},
-        {NotificationManager.IMPORTANCE_MAX     , NOTIFICATION_CHANNEL_AED_START  , "AED使用開始通知",            "AEDの使用が始まったときに通知されます。"},
-        {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_AED_FINISH , "AED使用終了通知",            "AEDの使用が終了したときに通知されます。"},
-        {NotificationManager.IMPORTANCE_DEFAULT , NOTIFICATION_CHANNEL_SERVER     , "サーバー接続状態通知",       "CPRSSサーバーとの接続状態に変化が発生したときに通知します。"}
+            {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_LOCATION   , "位置情報サービス関連の通知", "位置情報サービスの状態に変化が発生したときに通知されます。"},
+            {NotificationManager.IMPORTANCE_MAX     , NOTIFICATION_CHANNEL_AED_START  , "AED使用開始通知",            "AEDの使用が始まったときに通知されます。"},
+            {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_AED_FINISH , "AED使用終了通知",            "AEDの使用が終了したときに通知されます。"},
+            {NotificationManager.IMPORTANCE_DEFAULT , NOTIFICATION_CHANNEL_SERVER     , "サーバー接続状態通知",       "CPRSSサーバーとの接続状態に変化が発生したときに通知します。"}
     };
 
+    //////////////////////////
+    ///// フィールドたち /////
+    //////////////////////////
+
+    /**
+     * 位置情報の取得に必要なシステムサービス。
+     */
+    private LocationManager locMan;
+    /**
+     * {@link MainActivity#locMan locMan}により決定された、最も効率的な位置情報の取得方法。
+     */
+    private String bestProvider;
+    /**
+     * 現在の位置情報。
+     */
+    private Location currentLocation;
+
+    /**
+     * UIアップデートに使うハンドラ。
+     * {@link Handler#post(Runnable)} で投げた{@link Runnable}は、絶対にUIスレッドで実行される。
+     */
+    private Handler handler;
+
+    /**
+     * 現在の位置情報サービスの状態を示す{@link TextView}。
+     */
+    private TextView status;
+    /**
+     * 現在の緯度を示す{@link TextView}。making-UIブランチで消える。
+     */
+    private TextView lon;
+    /**
+     * 現在の経度を示す{@link TextView}。making-UIブランチで消える。
+     */
+    private TextView lat;
+
+    /**
+     * CPRSSのWebサーバーと通信するときに使うクライアント。
+     */
+    private CPRSS_WebSocketClient wsclient;
+
+    /**
+     * 現在使用中のAED。
+     */
+    private ArrayList<AEDInformation> aed_infos;
+    /**
+     * {@link ListView}に{@link AEDInformation}の情報を表示するのに必要な{@link Adapter}。
+     */
+    private AEDInformationAdapter adapter;
+
+    /**
+     * このインスタンス。別のスレッドから操作するときに使う。
+     */
     MainActivity virtual_this = this;
 
+    /**
+     * {@link MainActivity#onResume()} 時点で、アプリケーションを起動した直後か。
+     */
     boolean isStarting = false;
+
+    /**
+     * {@link AEDInformation}を保存するデータベースとの通信に使用する
+     */
+    AEDInformationDatabaseHelper dbhelper;
+
+    ////////////////////
+    ///// メソッド /////
+    ////////////////////
+
+    // ----- アプリ起動・UI ----- //
 
     /**
      * アプリケーションを起動した際に呼び出される。
@@ -86,9 +150,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        status = findViewById(R.id.status);  // 位置情報サービスの情報
-        lon    = findViewById(R.id.lon);     // 緯度
-        lat    = findViewById(R.id.lat);     // 経度
+        status = findViewById(R.id.status);
+        lon    = findViewById(R.id.lon);
+        lat    = findViewById(R.id.lat);
+
+        dbhelper = new AEDInformationDatabaseHelper(getApplicationContext());
 
         aed_infos = new ArrayList<>();
         adapter = new AEDInformationAdapter(this, aed_infos);
@@ -99,10 +165,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 "CPRSSが起動しました。",
                 "ご協力ありがとうございます。");
 
+        handler = new Handler();
+
         createNotificationChannel();
         initializeLocationManager();
 
         startUpdateLocation();
+        updateAEDList();
 
         try {
             wsclient = new CPRSS_WebSocketClient(new URI("ws://cprss-notificator.herokuapp.com/"), virtual_this);
@@ -114,16 +183,37 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
+    /**
+     * アプリケーションに帰ってきたときに呼び出される。
+     */
     public void onResume(){
         super.onResume();
-        handler = new Handler();
         if(!isStarting) {
             wsclient.reconnect();
             isStarting = false;
         }
     }
 
+    public void updateAEDList(){
+        AEDInformation[] aeds = dbhelper.getAEDInformationsFromDatabase();
 
+        aed_infos.clear();
+        aed_infos.addAll(Arrays.asList(aeds));
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    // ----- 位置情報関連 ----- //
+
+    /**
+     * 位置情報サービスを利用する旨をOSに報告する。
+     */
     private void initializeLocationManager(){
         locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -140,11 +230,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         bestProvider = locMan.getBestProvider(criteria, true);
     }
 
+    /**
+     * 指定された権限がユーザーによって許可されているかを確認する。
+     * @param permission 権限の名前
+     * @return 権限が許可されていた場合は true。
+     */
     private boolean isPermissionGranted(String permission){
         return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void checkPermission() {
+    /**
+     * 位置情報関連の権限を確認する。
+     */
+    private void checkLocationServicePermission() {
         if (!(isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) &&
                 isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION))) {
             ActivityCompat.requestPermissions(this,
@@ -153,15 +251,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
+    /**
+     * 位置情報の取得を開始する。
+     */
     private void startUpdateLocation() {
-        checkPermission();
+        checkLocationServicePermission();
         locMan.requestLocationUpdates(bestProvider, 60000, 3, this);
     }
 
+    /**
+     * 位置情報の取得を終了する。
+     */
     private void locationStop() {
         locMan.removeUpdates(this);
     }
 
+    /**
+     * 位置情報が更新されたときに呼び出される。
+     * @param location 新しい位置情報。
+     */
     @Override
     public void onLocationChanged(Location location){
         currentLocation = location;
@@ -169,6 +277,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         lon.setText(String.format(getString(R.string.longitude), currentLocation.getLongitude()));
     }
 
+    /**
+     * 位置情報サービスの状態が変化したときに呼び出される。
+     * @param provider 対象の位置情報プロバイダー
+     * @param service_st 新しいステータス
+     * @param extras おそらく、補足情報。
+     */
     @Override
     public void onStatusChanged(String provider, int service_st, Bundle extras) {
         switch (service_st) {
@@ -187,7 +301,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
-    String PROV_DISABLED_CHANNEL = "cprss_provdisabled";
+    /**
+     * 位置情報ブロバイダが無効になったときに呼び出される。
+     * @param provider 無効になったプロバイダ
+     */
     @Override
     public void onProviderDisabled(String provider){
         notify(NOTIFICATION_CHANNEL_LOCATION
@@ -196,6 +313,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 getString(R.string.notify_locservice_disabled_detail));
     }
 
+    /**
+     * 位置情報ブロバイダが有効になったときに呼び出される。
+     * @param provider 有効になったプロバイダ
+     */
     @Override
     public void onProviderEnabled(String provider){
         notify(  NOTIFICATION_CHANNEL_LOCATION,
@@ -204,28 +325,46 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 getString(R.string.notify_locservice_enabled_detail));
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    // ----- 通知 ----- //
 
+    /**
+     * Android 8 (Oreo／APIレベル26以上) 用に、通知チャンネルを有効化する。
+     */
+    private void createNotificationChannel() {
+        // AndroidのバージョンがOreo以上
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // NOTIFICATION_CHANNEL_INFORMATIONS のとおりにチャンネルを生成する。
             for(Object[] channelInfo : NOTIFICATION_CHANNEL_INFORMATIONS){
                 NotificationChannel channel = new NotificationChannel((String) channelInfo[1], (String) channelInfo[2], (int) channelInfo[0]);
                 channel.setDescription((String)channelInfo[3]);
-                // Register the channel with the system; you can't change the importance
-                // or other notification behaviors after this
                 NotificationManager notificationManager = getSystemService(NotificationManager.class);
                 notificationManager.createNotificationChannel(channel);
             }
         }
     }
 
+    /**
+     * 詳しいメッセージなしで通知を送信する
+     * @param channel 通知チャンネル名
+     * @param icon_res アイコンのリソースID
+     * @param title 通知タイトル
+     * @param text 通知内容
+     */
     private void notify(String channel, int icon_res, String title, String text){
         notify(channel, icon_res, title, text, null);
     }
 
+    /**
+     * 詳しいメッセージ付きで通知を送信する
+     * @param channel 通知チャンネル名
+     * @param icon_res アイコンのリソースID
+     * @param title 通知タイトル
+     * @param text 通知内容
+     * @param content 通知の詳細な内容
+     */
     private void notify(String channel, int icon_res, String title, String text, String content){
 
+        // 通知を識別するためのID。なんでもいい。適当に48971になっている。
         int unique_id = 48971;
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel)
@@ -242,13 +381,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
+    // ----- サーバーとの通信 ----- //
+
+    /**
+     * 接続に失敗した際に再試行した回数。
+     */
     int retryCount = 0;
+
+    /**
+     * 次に接続試行するまでの時間。(5秒 + {@code interval}分)
+     */
+    int interval = 0;
+
+    /**
+     * サーバーとの接続に成功したときに呼び出される。
+     * @param handshakedata 接続成功に関する詳しい情報。
+     */
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         retryCount = 0;
         Log.e("WS", "could access to server!");
     }
 
+    /**
+     * サーバーとの接続が切断されたときに呼び出される。
+     * 処理としては、10回接続を試行し、失敗した場合は通知を送信して、しばらく時間を置いてから試行する。
+     * @param code 切断された理由。
+     * @param reason 切断された理由。
+     * @param remote サーバー側から切断された理由は True。
+     */
     @Override
     public void onClose(int code, String reason, boolean remote) {
 
@@ -262,10 +423,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                             getString(R.string.notify_disconnection_detail),
                             getString(R.string.notify_disconnection_detail) + "\n" +
                                     getString(R.string.notify_disconnected_context)
+                            retryCount = 0;
+                            interval += 1;
                     );
                 }
                 try{
-                    Thread.sleep(5000);
+                    Thread.sleep(5000 + (1000 * 60 * interval));
                 } catch (InterruptedException e) {
                     Log.e("WebSocket Ret.", "Couldn't wait enough time due to interruption.");
                 }
@@ -276,19 +439,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }).start();
     }
 
+    /**
+     * AED使用が開始されたときに通知される。
+     * @param aedInfo AED情報。
+     */
     @Override
     public void onAEDUseStarted(AEDInformation aedInfo) {
 
-        String distance_raw = ((EditText) findViewById(R.id.dist)).getText().toString();
-        if(!distance_raw.equals("")){
-            double req_distance = Float.parseFloat(distance_raw);
+        // 距離で識別する
+        if(currentLocation != null) {
+            String distance_raw = ((EditText) findViewById(R.id.dist)).getText().toString();
+            if (!distance_raw.equals("")) {
+                double req_distance = Float.parseFloat(distance_raw);
 
-            float[] results = new float[3];
-            Location.distanceBetween(
-                    aedInfo.getLatitude(), aedInfo.getLongitude(),
-                    currentLocation.getLatitude(), currentLocation.getLongitude(), results);
-            if(req_distance < results[0] / 1000) return;
+                float[] results = new float[3];
+                Location.distanceBetween(
+                        aedInfo.getLatitude(), aedInfo.getLongitude(),
+                        currentLocation.getLatitude(), currentLocation.getLongitude(), results);
+                if (req_distance < results[0] / 1000) return;
 
+            }
         }
 
 
@@ -297,49 +467,42 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 getString(R.string.notify_aed_open),
                 getString(R.string.notify_aed_open_detail),
                 getString(R.string.notify_aed_open_context));
-        aed_infos.add(0, aedInfo);
-        ArrayList<AEDInformation> temp_aeds = new ArrayList<>(aed_infos);
 
-        aed_infos.clear();
-        aed_infos.addAll(temp_aeds);
+        dbhelper.saveData(aedInfo);
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-            }
-        });
+        updateAEDList();
 
     }
 
-
+    /**
+     * AED使用が完了した際に通知される。
+     * @param aedInfo AED情報。
+     */
     @Override
     public void onAEDUseFinished(AEDInformation aedInfo) {
         notify(NOTIFICATION_CHANNEL_AED_FINISH,
                 android.R.drawable.ic_dialog_info,
                 getString(R.string.notify_aed_close),
                 getString(R.string.notify_aed_close_detail));
-        for(int i = 0;i<aed_infos.size();i++) {
-            if (aed_infos.get(i).getAed_id().equals(aedInfo.getAed_id())) {
-                aed_infos.remove(i);
-                break;
-            }
-        }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-            }
-        });
+        dbhelper.deleteData(aedInfo.getAed_id());
+        updateAEDList();
 
     }
 
+    /**
+     * メッセージを受信したが、{@link CPRSS_WebSocketClient}が解釈できなかった場合に通知される。
+     * @param message 受信したメッセージ。
+     */
     @Override
     public void onOtherMessage(String message) {
         Log.e("CPRSS", "Unparsed Message: " + message);
 
     }
 
+    /**
+     * サーバーとの通信において、例外が発生した場合に通知される。
+     * @param e 発生した例外
+     */
     @Override
     public void onError(Exception e) {
 
