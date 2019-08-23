@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CPRSS 通知受信アプリ</string>
+    <string name="service_name">CPRSS</string>
+    <string name="latitude">緯度: %f</string>
+    <string name="notifyDist">最低通知距離</string>
+    <string name="longitude">経度: %f</string>
+    <string name="unlocate">まだ位置情報を取得していません。</string>
+    <string name="locservice_outofservice">圏外のため、位置情報を取得できません。</string>
+    <string name="locservice_temp">一時的に位置情報を取得できません。</string>
+    <string name="locservice_unknown">位置情報の状態が不明です。</string>
+    <string name="notify_locservice_disable">位置情報サービスが無効になりました。</string>
+    <string name="notify_locservice_disabled_detail">距離に関係なく。全ての通知を受け取ります。\n遠い場所からの通知をブロックするには、位置情報を有効にしてください。</string>
+    <string name="notify_locservice_enabled">位置情報サービスが有効になりました。</string>
+    <string name="notify_locservice_enabled_detail">ご協力ありがとうございます。</string>
+    <string name="notify_disconnected">サーバーとの接続が切断されました。</string>
+    <string name="notify_disconnection_detail">通知を受け取ることができません。</string>
+    <string name="notify_disconnected_context">サーバー側の問題である可能性がある場合は、開発者にご連絡ください。</string>
+    <string name="notify_aed_open">AED使用が開始されました。人命救助の応援が必要な可能性な可能性があります。</string>
+    <string name="notify_aed_open_detail">タップして場所と確認してください。</string>
+    <string name="notify_aed_open_context">設定した範囲内で、人命救助を必要としている人がいます。\n応援にご協力ください。\nタップして位置を確認してください。</string>
+    <string name="notify_aed_close">AED使用が終了しました。</string>
+    <string name="notify_aed_close_detail">AED使用が終了しました。ご協力ありがとうございました。</string>
+    <string name="app_title">通知受信アプリ</string>
+</resources>
