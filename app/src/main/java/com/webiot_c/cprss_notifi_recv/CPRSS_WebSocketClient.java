@@ -1,5 +1,7 @@
 package com.webiot_c.cprss_notifi_recv;
 
+import android.util.Log;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -21,6 +23,7 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
+        Log.e("SKT", message);
         String[] mes_formatted = message.split("#");
         if(mes_formatted.length != 4){
             listener.onOtherMessage(message);
