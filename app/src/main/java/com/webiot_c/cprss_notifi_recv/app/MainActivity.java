@@ -62,10 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private AEDInformationAdapter adapter;
 
     /**
-     * このインスタンス。別のスレッドから操作するときに使う。
-     */
-    MainActivity virtual_this = this;
-    /**
      * {@link AEDInformation}を保存するデータベースとの通信に使用する
      */
     AEDInformationDatabaseHelper dbhelper;
@@ -98,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         aed_infos = new ArrayList<>();
         adapter = new AEDInformationAdapter(this, aed_infos);
         ((ListView)findViewById(R.id.list)).setAdapter(adapter);
-
-
 
         handler = new Handler();
 
@@ -199,17 +193,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void registerBroadcastReceivers(){
 
-        broadcastReceeiveManager = new BroadcastReceeiveManager();
-
-        IntentFilter bri_filter = new IntentFilter();
-        bri_filter.addAction("android.intent.action.BOOT_COMPLETED");
-        bri_filter.addAction("android.intent.action.PACKAGE_REPLACED");
-        bri_filter.addAction("AED_STARTED");
-        bri_filter.addAction("AED_LOCATION_UPDATED");
-        bri_filter.addAction("AED_FINISHED");
-
-        registerReceiver(broadcastReceeiveManager, bri_filter);
-
 
         databaseUpdateReceiver = new DatabaseUpdateReceiver();
         IntentFilter dur_filter = new IntentFilter();
@@ -224,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
      * {@link MainActivity#registerBroadcastReceivers()}で登録した{@link BroadcastReceiver}を登録解除する
      */
     public void unregisterBroadcastReceivers(){
-        unregisterReceiver(broadcastReceeiveManager);
         unregisterReceiver(databaseUpdateReceiver);
     }
 }

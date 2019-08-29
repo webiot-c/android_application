@@ -76,13 +76,10 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
         locationGetter = new LocationGetter(this, this);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        if (wsclient.isClosed()){
+            wsclient.reconnect();
+        }
 
-                wsclient.reconnect();
-            }
-        }).start();
         return Service.START_STICKY;
     }
 
@@ -156,7 +153,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     interval += 1;
                 }
                 try{
-                    Thread.sleep(5000 + (1000 * 60 * interval));
+                    Thread.sleep(500 + (1000 * 60 * interval));
                 } catch (InterruptedException e) {
                     Log.e("WebSocket Ret.", "Couldn't wait enough time due to interruption.");
                 }

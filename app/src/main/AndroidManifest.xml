@@ -49,6 +49,13 @@
             android:name=".app.service.CPRSS_BackgroundAccessService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <receiver android:name=".app.BroadcastReceeiveManager" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 
