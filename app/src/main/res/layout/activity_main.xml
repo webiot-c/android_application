@@ -5,16 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".app.MainActivity">
 
     <LinearLayout
+        android:id="@+id/title_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/noaedinfo"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/service_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="16dp"
@@ -24,7 +25,7 @@
             android:textSize="30dp" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/app_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -40,39 +41,6 @@
         android:layout_height="match_parent"
         android:layout_margin="16dp"
         android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAlignment="viewStart" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/lat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/unlocate"
-                android:textAlignment="viewStart" />
-
-            <TextView
-                android:id="@+id/lon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="viewStart" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -98,9 +66,39 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:importantForAutofill="no"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textAlignment="textEnd" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Km" />
+
+                <Button
+                    android:id="@+id/apply"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/apply_distance" />
 
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="2sp"
+                android:padding="2sp"
+                android:text="@string/about_location"
+                android:typeface="normal" />
         </LinearLayout>
 
         <LinearLayout
@@ -114,7 +112,9 @@
                 android:layout_height="wrap_content">
 
             </ListView>
+
         </LinearLayout>
+
     </LinearLayout>
 
 

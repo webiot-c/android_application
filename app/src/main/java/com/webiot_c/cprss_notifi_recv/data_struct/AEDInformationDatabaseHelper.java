@@ -1,7 +1,5 @@
-package com.webiot_c.cprss_notifi_recv;
+package com.webiot_c.cprss_notifi_recv.data_struct;
 
-import android.app.TaskStackBuilder;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,9 +28,18 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    AEDInformationDatabaseHelper(Context context) {
+    private static AEDInformationDatabaseHelper aedInformationDatabaseHelper;
+
+    public AEDInformationDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
+    }
+
+    public static AEDInformationDatabaseHelper getInstance(Context context){
+        if(aedInformationDatabaseHelper == null){
+            aedInformationDatabaseHelper = new AEDInformationDatabaseHelper(context);
+        }
+        return aedInformationDatabaseHelper;
     }
 
     @Override
@@ -81,6 +88,20 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return aeds.toArray(new AEDInformation[aeds.size()]);
+    }
+
+    public boolean isAlreadyRegistred(String aedid){
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_NAME,
+                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE},
+                COLUMN_NAME_ADEID + "=?", new String[]{aedid}, null, null, null
+        );
+
+        int dataCount = cursor.getCount();
+        cursor.close();
+
+        return dataCount >= 1;
     }
 
     public void saveData(AEDInformation aedInfo){

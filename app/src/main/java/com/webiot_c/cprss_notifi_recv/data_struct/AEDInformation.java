@@ -1,4 +1,4 @@
-package com.webiot_c.cprss_notifi_recv;
+package com.webiot_c.cprss_notifi_recv.data_struct;
 
 import android.content.ContentValues;
 import android.database.Cursor;

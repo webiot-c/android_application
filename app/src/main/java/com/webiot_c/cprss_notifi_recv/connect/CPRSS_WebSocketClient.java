@@ -1,19 +1,25 @@
-package com.webiot_c.cprss_notifi_recv;
+package com.webiot_c.cprss_notifi_recv.connect;
 
 import android.util.Log;
+
+import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CPRSS_WebSocketClient extends WebSocketClient {
 
     CPRSS_WebSocketClientListener listener;
 
-    CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener){
+    public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener){
         super(uri);
         this.listener = listener;
+        Log.e("CPRSS_WSC", "New instance!");
     }
 
     @Override
