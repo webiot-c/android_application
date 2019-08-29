@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import com.webiot_c.cprss_notifi_recv.R;
 
@@ -25,13 +26,13 @@ public class LocationGetter implements LocationListener {
     LocationManager locationManager;
     String bestProvider;
 
-    LocationStatusChangedListener listener;
-
     Context context;
 
-    public LocationGetter(Context context, LocationStatusChangedListener listener){
+    Location currentLocation;
+
+    public LocationGetter(Context context){
         initializeLocationManager(context);
-        this.listener = listener;
+        startUpdateLocation();
         this.context = context;
     }
 
@@ -74,29 +75,6 @@ public class LocationGetter implements LocationListener {
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
         }
     }
-
-    /**
-     * 位置情報が更新されたときに呼び出される。
-     * @param location 新しい位置情報。
-     */
-    @Override
-    public void onLocationChanged(Location location){
-
-        listener.onLocationChanged(location);
-
-    }
-
-    /**
-     * 位置情報サービスの状態が変化したときに呼び出される。
-     * @param provider 対象の位置情報プロバイダー
-     * @param service_st 新しいステータス
-     * @param extras おそらく、補足情報。
-     */
-    @Override
-    public void onStatusChanged(String provider, int service_st, Bundle extras) {
-        listener.onStatusChanged(service_st);
-    }
-
     /**
      * 位置情報ブロバイダが無効になったときに呼び出される。
      * @param provider 無効になったプロバイダ
@@ -122,4 +100,35 @@ public class LocationGetter implements LocationListener {
                 context.getString(R.string.notify_locservice_enabled),
                 context.getString(R.string.notify_locservice_enabled_detail));
     }
+
+    /**
+     * 位置情報の取得を開始する。
+     */
+    public void startUpdateLocation() {
+        locationManager.requestLocationUpdates(bestProvider, 60000, 3, this);
+    }
+
+    /**
+     * 位置情報の取得を終了する。
+     */
+    public void stopUpdateLocation() {
+        locationManager.removeUpdates(this);
+    }
+
+    // ----- 位置情報関連 ----- //
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.e("LocationCHanged", "Location is now changed.");
+        currentLocation = location;
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    public Location getCurrentLocation(){
+        return currentLocation;
+    }
+
 }

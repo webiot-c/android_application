@@ -3,14 +3,23 @@ package com.webiot_c.cprss_notifi_recv.app;
 import android.app.ActivityManager;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Adapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,7 +38,7 @@ import java.util.Arrays;
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
  * @author loxygenK
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextWatcher {
 
     ////////////////////////////////////////////
     // MainActivityに付随するBroacastReceiver //
@@ -74,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceeiveManager broadcastReceeiveManager;
     DatabaseUpdateReceiver databaseUpdateReceiver;
 
+    Messenger mServiceMessenger;
+
+    public static int notification_distance;
+
     ////////////////////
     ///// メソッド /////
     ////////////////////
@@ -96,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         ((ListView)findViewById(R.id.list)).setAdapter(adapter);
 
         handler = new Handler();
+
+        ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
         NotificationUtility.deleteNotificationChannel(this);
         NotificationUtility.createNotificationChannel(this);
@@ -187,6 +202,30 @@ public class MainActivity extends AppCompatActivity {
         // こっちはいいらしい。
         stopService(new Intent(this, CPRSS_BackgroundAccessService.class));
     }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+        int distance = Integer.MAX_VALUE;
+        if(s.length() > 0){
+            String raw_stsring = s.toString();
+            distance = Integer.valueOf(raw_stsring);
+        }
+        notification_distance = distance;
+
+    }
+
+    // ----- サービス管理 ----- //
 
     /**
      * {@link BroadcastReceiver}を登録する

@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 
 import com.webiot_c.cprss_notifi_recv.R;
+import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
@@ -22,13 +26,21 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 
-public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebSocketClientListener, LocationGetter.LocationStatusChangedListener{
+public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebSocketClientListener{
 
     public class BroadcastConstant {
         public static final String AED_STARTED          = "AED_STARTED";
         public static final String AED_LOCATION_UPDATED = "AED_LOCATION_UPDATED";
         public static final String AED_FINISHED         = "AED_FINISHED";
         public static final String DATABASE_UPDATED     = "DATABASE_UPDATED";
+    }
+
+    class ActivityMessageReceiver extends Handler {
+        @Override
+        public void handleMessage(Message mes){
+            distance = mes.what;
+            Log.e("DistanceUpdated", distance + " Km");
+        }
     }
 
     /**
@@ -43,7 +55,9 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     LocationGetter locationGetter;
 
-    Location currentLocation;
+    Messenger mServiceMessenger = new Messenger( new ActivityMessageReceiver());
+
+    int distance;
 
     @Override
     public void onCreate() {
@@ -74,7 +88,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
 
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
-        locationGetter = new LocationGetter(this, this);
+        locationGetter = new LocationGetter(this);
 
         if (wsclient.isClosed()){
             wsclient.reconnect();
@@ -90,20 +104,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mServiceMessenger.getBinder();
     }
-
-    // ----- 位置情報関連 ----- //
-    @Override
-    public void onLocationChanged(Location location) {
-        currentLocation = location;
-    }
-
-    @Override
-    public void onStatusChanged(int statusCode) {
-
-    }
-
 
     // ----- サーバー接続関連 ----- //
 
@@ -174,18 +176,14 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
 
         // 距離で識別する
-        if(currentLocation != null) {
-            String distance_raw = /* ((EditText) findViewById(R.id.dist)).getText().toString() */ "";
-            if (!distance_raw.equals("")) {
-                double req_distance = Float.parseFloat(distance_raw);
+        if(locationGetter.getCurrentLocation() != null) {
+            double req_distance = MainActivity.notification_distance;
 
-                float[] results = new float[3];
-                Location.distanceBetween(
-                        aedInfo.getLatitude(), aedInfo.getLongitude(),
-                        currentLocation.getLatitude(), currentLocation.getLongitude(), results);
-                if (req_distance < results[0] / 1000) return;
-
-            }
+            float[] results = new float[3];
+            Location.distanceBetween(
+                    aedInfo.getLatitude(), aedInfo.getLongitude(),
+                    locationGetter.getCurrentLocation().getLatitude(), locationGetter.getCurrentLocation().getLongitude(), results);
+            if (req_distance < results[0] / 1000) return;
         }
 
 

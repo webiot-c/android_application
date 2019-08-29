@@ -76,13 +76,6 @@
                     android:layout_weight="1"
                     android:text="Km" />
 
-                <Button
-                    android:id="@+id/apply"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/apply_distance" />
-
             </LinearLayout>
         </LinearLayout>
 
