@@ -1,4 +1,6 @@
-package com.webiot_c.cprss_notifi_recv;
+package com.webiot_c.cprss_notifi_recv.connect;
+
+import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 
 import org.java_websocket.handshake.ServerHandshake;
 

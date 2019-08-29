@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CPRSS 通知受信アプリ</string>
-    <string name="service_name">CPRSS</string>
     <string name="latitude">緯度: %f</string>
     <string name="notifyDist">最低通知距離</string>
     <string name="longitude">経度: %f</string>
@@ -22,4 +21,7 @@
     <string name="notify_aed_close">AED使用が終了しました。</string>
     <string name="notify_aed_close_detail">AED使用が終了しました。ご協力ありがとうございました。</string>
     <string name="app_title">通知受信アプリ</string>
+    <string name="notify_background">%s - サーバー通信</string>
+    <string name="about_location">このアプリケーションは、通知を受信するかどうかを判断するために、位置情報を取得することが出来ます。\n取得した位置情報を、AEDやCPRSSサーバーなどの外部に送信することはありません。</string>
+    <string name="apply_distance">適用</string>
 </resources>

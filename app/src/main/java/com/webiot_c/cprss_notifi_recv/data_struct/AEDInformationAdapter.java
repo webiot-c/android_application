@@ -1,12 +1,13 @@
-package com.webiot_c.cprss_notifi_recv;
+package com.webiot_c.cprss_notifi_recv.data_struct;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.webiot_c.cprss_notifi_recv.R;
 
 import java.util.ArrayList;
 import java.util.Locale;
