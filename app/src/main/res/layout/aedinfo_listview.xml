@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout
+    android:id="@+id/aedinfo_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="5dp"
+    android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical">
 
     <LinearLayout

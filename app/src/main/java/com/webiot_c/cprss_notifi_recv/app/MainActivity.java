@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,15 +16,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.app.service.CPRSS_BackgroundAccessService;
@@ -40,7 +48,7 @@ import java.util.Arrays;
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
  * @author loxygenK
  */
-public class MainActivity extends AppCompatActivity implements TextWatcher {
+public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener {
 
     ////////////////////////////////////////////
     // MainActivityに付随するBroacastReceiver //
@@ -106,9 +114,41 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
 
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
 
+
+        final RecyclerView list = ((RecyclerView)findViewById(R.id.list));
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+
         aed_infos = new ArrayList<>();
-        adapter = new AEDInformationAdapter(this, aed_infos);
-        ((ListView)findViewById(R.id.list)).setAdapter(adapter);
+        adapter = new AEDInformationAdapter(this, aed_infos, this);
+
+        list.setHasFixedSize(true);
+        list.addItemDecoration(itemDecoration);
+        list.setLayoutManager(layoutManager);
+        list.setAdapter(adapter);
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+
+                return false;
+
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                int swipedPosition = viewHolder.getAdapterPosition();
+                AEDInformationAdapter adapter = (AEDInformationAdapter) list.getAdapter();
+                AEDInformation deleted = adapter.remove(swipedPosition);
+
+                dbhelper.deleteData(deleted.getAed_id());
+
+                updateUIProperties();
+
+            }
+        };
+
+        (new ItemTouchHelper(callback)).attachToRecyclerView(list);
 
         handler = new Handler();
 
@@ -120,6 +160,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         requestPermission();
 
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(this, ((TextView)v.findViewById(R.id.adeid)).getText(), Toast.LENGTH_LONG).show();
     }
 
 
@@ -201,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                adapter.updateList(aed_infos);
                 adapter.notifyDataSetChanged();
             }
         });
