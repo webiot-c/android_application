@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
@@ -95,7 +97,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     Messenger mServiceMessenger;
 
-    public static int notification_distance;
+    public static float notification_distance;
+
+    SharedPreferences sharedPreferences;
 
     ////////////////////
     ///// メソッド /////
@@ -112,10 +116,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sharedPreferences = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
 
+        ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
 
-        final RecyclerView list = ((RecyclerView)findViewById(R.id.list));
+        final RecyclerView list = findViewById(R.id.list);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -157,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         NotificationUtility.deleteNotificationChannel(this);
         NotificationUtility.createNotificationChannel(this);
 
+
         requestPermission();
 
 
@@ -164,6 +171,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     @Override
     public void onClick(View v) {
+
+        AEDInformation aed_Info = dbhelper.getAEDInformation(((TextView)v.findViewById(R.id.adeid)).getText().toString());
+
+        Intent intent = new Intent(this, AEDLocation.class);
+        intent.putExtra("aed-id", aed_Info.getAed_id());
+        intent.putExtra("lat", aed_Info.getLatitude());
+        intent.putExtra("lon", aed_Info.getLongitude());
+
+        startActivity(intent);
+
         Toast.makeText(this, ((TextView)v.findViewById(R.id.adeid)).getText(), Toast.LENGTH_LONG).show();
     }
 
@@ -316,12 +333,21 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     @Override
     public void afterTextChanged(Editable s) {
 
-        int distance = Integer.MAX_VALUE;
+        float distance = Float.MAX_VALUE;
         if(s.length() > 0){
             String raw_stsring = s.toString();
-            distance = Integer.valueOf(raw_stsring);
+            try {
+                distance = Float.valueOf(raw_stsring);
+            } catch (NumberFormatException e){
+                return;
+            }
         }
         notification_distance = distance;
+
+        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = data.edit();
+        editor.putFloat("Notification_Distance", notification_distance);
+        editor.apply();
 
     }
 

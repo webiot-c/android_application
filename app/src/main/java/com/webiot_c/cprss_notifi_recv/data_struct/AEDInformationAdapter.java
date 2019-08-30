@@ -6,16 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.support.v7.widget.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.webiot_c.cprss_notifi_recv.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAdapter.ViewHolder> {
@@ -35,7 +31,7 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
             super(v);
             root = v.findViewById(R.id.aedinfo_root);
             aedid = v.findViewById(R.id.adeid);
-            location = v.findViewById(R.id.loc);
+            location = v.findViewById(R.id.map_loc);
         }
 
     }

@@ -29,4 +29,5 @@
     <string name="reconnected">サーバーとの接続が復帰しました。</string>
     <string name="loc_permission_turnoff">%s からのお知らせ：\n位置情報権限がオフになりました</string>
     <string name="loc_permission_turnoff_context">サービスを続行できないため、アプリケーションを終了します。\nサービスを続行するには、位置情報権限を許可し、もう一度起動してください。</string>
+    <string name="location_view">AEDの場所</string>
 </resources>

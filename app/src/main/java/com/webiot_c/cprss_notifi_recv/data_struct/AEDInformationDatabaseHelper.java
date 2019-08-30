@@ -66,6 +66,30 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
         getWritableDatabase().delete(TABLE_NAME, null, null);
     }
 
+    public AEDInformation getAEDInformation(String aed_id){
+
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_NAME,
+                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE},
+                COLUMN_NAME_ADEID + "=?", new String[]{ aed_id },
+                null, null, null
+        );
+
+        AEDInformation aed_info;
+
+        cursor.moveToFirst();
+
+        if(cursor.getCount() == 0) return null;
+
+        aed_info = new AEDInformation(
+                cursor.getString(0),
+                cursor.getDouble(1),
+                cursor.getDouble(2)
+        );
+
+        return aed_info;
+
+    }
 
     public AEDInformation[] getAEDInformationsFromDatabase(){
 

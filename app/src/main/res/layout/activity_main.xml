@@ -66,7 +66,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:importantForAutofill="no"
-                    android:inputType="number"
+                    android:inputType="number|numberDecimal"
                     android:textAlignment="textEnd" />
 
                 <TextView

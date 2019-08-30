@@ -245,6 +245,9 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         Intent intent = new Intent();
         intent.setAction(BroadcastConstant.AED_STARTED);
+        intent.putExtra("aed-id", aedInfo.getAed_id());
+        intent.putExtra("lat", aedInfo.getLatitude());
+        intent.putExtra("lon", aedInfo.getLongitude());
         sendBroadcast(intent);
 
         requestDatabaseUpdate();
@@ -259,6 +262,9 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         Intent intent = new Intent();
         intent.setAction(BroadcastConstant.AED_LOCATION_UPDATED);
+        intent.putExtra("aed-id", aedInfo.getAed_id());
+        intent.putExtra("lat", aedInfo.getLatitude());
+        intent.putExtra("lon", aedInfo.getLongitude());
         sendBroadcast(intent);
 
         requestDatabaseUpdate();
@@ -280,6 +286,9 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         Intent intent = new Intent();
         intent.setAction(BroadcastConstant.AED_FINISHED);
+        intent.putExtra("aed-id", aedInfo.getAed_id());
+        intent.putExtra("lat", aedInfo.getLatitude());
+        intent.putExtra("lon", aedInfo.getLongitude());
         sendBroadcast(intent);
 
         requestDatabaseUpdate();
