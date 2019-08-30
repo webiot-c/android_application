@@ -160,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
-        NotificationUtility.deleteNotificationChannel(this);
         NotificationUtility.createNotificationChannel(this);
 
 
