@@ -1,57 +1,63 @@
 package com.webiot_c.cprss_notifi_recv.data_struct;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.support.v7.widget.*;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.webiot_c.cprss_notifi_recv.R;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
-public class AEDInformationAdapter extends BaseAdapter {
+public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAdapter.ViewHolder> {
 
+    ArrayList<AEDInformation> dataset;
     Context context;
-    LayoutInflater lif = null;
-    ArrayList<AEDInformation> aeds;
 
-    public AEDInformationAdapter(Context context) {
-        this(context, null);
+    View.OnClickListener listener;
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        TextView aedid;
+        TextView location;
+        LinearLayout root;
+
+        ViewHolder(View v){
+            super(v);
+            root = v.findViewById(R.id.aedinfo_root);
+            aedid = v.findViewById(R.id.adeid);
+            location = v.findViewById(R.id.loc);
+        }
+
     }
-    public AEDInformationAdapter(Context context, ArrayList<AEDInformation> aeds) {
+
+    public AEDInformationAdapter(Context context, ArrayList<AEDInformation> dataset, View.OnClickListener listener){
         this.context = context;
-        this.lif = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.aeds = aeds;
+        this.dataset = new ArrayList<>(dataset);
+        this.listener = listener;
     }
 
-    public void setList(ArrayList<AEDInformation> aeds){
-        this.aeds = aeds;
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewtype) {
+        View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.aedinfo_listview, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public int getCount() {
-        return aeds.size();
-    }
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-    @Override
-    public Object getItem(int position) {
-        return aeds.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return aeds.get(position).getUniqueID();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = lif.inflate(R.layout.aedinfo_listview, parent, false);
-
-        AEDInformation aed = aeds.get(position);
-        ((TextView)convertView.findViewById(R.id.adeid)).setText(aed.getAed_id());
+        AEDInformation aed = dataset.get(position);
 
         String location = String.format(Locale.getDefault(),
                 context.getString(R.string.latitude) + " ／  " + context.getString(R.string.longitude),
@@ -59,8 +65,34 @@ public class AEDInformationAdapter extends BaseAdapter {
                 aed.getLongitude()
         );
 
-        ((TextView)convertView.findViewById(R.id.loc)).setText(location);
+        holder.aedid.setText(aed.getAed_id());
+        holder.location.setText(location);
 
-        return convertView;
+        holder.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClick(view);
+            }
+        });
+
     }
+
+    public void updateList(ArrayList<AEDInformation> dataset){
+        this.dataset = dataset;
+    }
+
+    public void add(int position, AEDInformation aedinfo){
+        this.dataset.add(position, aedinfo);
+    }
+
+
+    public AEDInformation remove(int position){
+        return this.dataset.remove(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return dataset.size();
+    }
+
 }
