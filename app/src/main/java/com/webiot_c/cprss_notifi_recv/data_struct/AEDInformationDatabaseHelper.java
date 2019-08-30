@@ -30,13 +30,16 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
     private static AEDInformationDatabaseHelper aedInformationDatabaseHelper;
 
-    public AEDInformationDatabaseHelper(Context context) {
+    private AEDInformationDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
 
     public static AEDInformationDatabaseHelper getInstance(Context context){
         if(aedInformationDatabaseHelper == null){
+            if(context == null){
+                throw new IllegalStateException("一番最初に作るときにはcontextが必要です!!!!!111");
+            }
             aedInformationDatabaseHelper = new AEDInformationDatabaseHelper(context);
         }
         return aedInformationDatabaseHelper;
@@ -106,13 +109,26 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
     public void saveData(AEDInformation aedInfo){
 
-        String query = String.format("INSERT INTO %s ( %s, %s, %s) VALUES ('%s', '%s', '%s')",
+        String query = String.format("INSERT INTO %s ( %s, %s, %s) VALUES ('%s', '%f', '%f')",
                 TABLE_NAME,
                 COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE,
                 aedInfo.getAed_id(), aedInfo.getLatitude(), aedInfo.getLongitude());
 
         getWritableDatabase().execSQL(query);
 
+    }
+
+    public void updateData(AEDInformation aedInfo){
+        if(!isAlreadyRegistred(aedInfo.getAed_id()))
+            throw new IllegalArgumentException("登録されていないAEDInformationをアップデートしようとしました。");
+
+        String query = String.format("UPDATE %s SET %s=%f, %S=%f WHERE %s=\"%s\"",
+                TABLE_NAME,
+                COLUMN_NAME_LATITUDE, aedInfo.getLatitude(),
+                COLUMN_NAME_LONGITUDE, aedInfo.getLongitude(),
+                COLUMN_NAME_ADEID, aedInfo.getAed_id());
+
+        getWritableDatabase().execSQL(query);
     }
 
     public void deleteData(String aedid){

@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbhelper = new AEDInformationDatabaseHelper(getApplicationContext());
+        dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
 
         aed_infos = new ArrayList<>();
         adapter = new AEDInformationAdapter(this, aed_infos);

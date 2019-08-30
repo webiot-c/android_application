@@ -9,6 +9,7 @@ public interface CPRSS_WebSocketClientListener {
     void onOpen(ServerHandshake handshakedata);
     void onClose(int code, String reason, boolean remote);
     void onAEDUseStarted(AEDInformation aedInfo);
+    void onAEDLocationUpdated(AEDInformation aedInfo);
     void onAEDUseFinished(AEDInformation aedInfo);
     void onOtherMessage(String message);
     void onError(Exception e);

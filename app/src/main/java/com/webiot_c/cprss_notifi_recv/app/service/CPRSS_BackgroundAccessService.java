@@ -1,18 +1,25 @@
 package com.webiot_c.cprss_notifi_recv.app.service;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.WindowManager;
 
+import com.webiot_c.cprss_notifi_recv.DialogActivity;
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
@@ -60,16 +67,30 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     int distance;
 
+    boolean isErrorOccured = false;
+
     @Override
     public void onCreate() {
+        super.onCreate();
+
+        if(!isLocationPermissionGranted()){
+
+            Intent intent = new Intent(this, DialogActivity.class);
+            intent.putExtra("title", String.format(getString(R.string.loc_permission_turnoff), getString(R.string.service_name)));
+            intent.putExtra("mes", getString(R.string.loc_permission_turnoff_context));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            isErrorOccured = true;
+            return;
+        }
 
         try {
-            wsclient = new CPRSS_WebSocketClient(new URI(WS_SERVER_ADDRESS), CPRSS_BackgroundAccessService.this );
+            wsclient = new CPRSS_WebSocketClient(new URI(WS_SERVER_ADDRESS), CPRSS_BackgroundAccessService.this, this );
+            Log.e("WSC", ( wsclient == null ? null : wsclient.toString()));
         } catch(Exception e){
-
+            Log.e("WSC", "Error occured in creating instance", e);
         }
         wsclient.connect();
-        super.onCreate();
     }
 
     @Override
@@ -86,6 +107,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     .build();
 
             startForeground(1, notify);
+        }
+
+        if(isErrorOccured){
+            stopSelf();
+            return Service.START_NOT_STICKY;
         }
 
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
@@ -121,13 +147,26 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     int interval = 0;
 
     /**
+     * 一度接続失敗の通知を表示しているか
+     */
+    boolean isDisconnedtedNoticed = false;
+
+    /**
      * サーバーとの接続に成功したときに呼び出される。
      * @param handshakedata 接続成功に関する詳しい情報。
      */
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         retryCount = 0;
-        Log.e("WS_SERVER_ADDRESS", "could access to server!");
+        if(isDisconnedtedNoticed){
+            isDisconnedtedNoticed = false;
+            NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
+                    this,
+                    android.R.drawable.ic_dialog_info,
+                    getString(R.string.reconnected),
+                    getString(R.string.reconnected));
+        }
+        Log.e("WebSokcet Ret.", "Accessed to server!");
     }
 
     /**
@@ -143,24 +182,26 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(retryCount > 10){
+                if(retryCount > 10 && !isDisconnedtedNoticed){
                     NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
                             CPRSS_BackgroundAccessService.this,
-                            android.R.drawable.ic_dialog_info,
+                            android.R.drawable.ic_dialog_alert,
                             getString(R.string.notify_disconnected),
                             getString(R.string.notify_disconnection_detail),
                             getString(R.string.notify_disconnection_detail) + "\n" +
                             getString(R.string.notify_disconnected_context)
                     );
+                    isDisconnedtedNoticed = true;
                     retryCount = 0;
                     interval += 1;
+                    Log.e("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
                 }
+                Log.e("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
                 try{
                     Thread.sleep(500 + (1000 * 60 * interval));
                 } catch (InterruptedException e) {
                     Log.e("WebSocket Ret.", "Couldn't wait enough time due to interruption.");
                 }
-                Log.e("WebSocket Ret.", "Cannnot access to server! trying. attempt " + String.valueOf(retryCount) + "/10");
                 wsclient.reconnect();
                 retryCount++;
             }
@@ -176,6 +217,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
 
+        Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
         if(locationGetter.getCurrentLocation() != null) {
             double req_distance = MainActivity.notification_distance;
@@ -203,6 +245,20 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         Intent intent = new Intent();
         intent.setAction(BroadcastConstant.AED_STARTED);
+        sendBroadcast(intent);
+
+        requestDatabaseUpdate();
+
+    }
+
+    @Override
+    public void onAEDLocationUpdated(AEDInformation aedInfo){
+
+        Log.e("AEDLocationUpdateLis", aedInfo.toString());
+        dbhelper.updateData(aedInfo);
+
+        Intent intent = new Intent();
+        intent.setAction(BroadcastConstant.AED_LOCATION_UPDATED);
         sendBroadcast(intent);
 
         requestDatabaseUpdate();
@@ -253,6 +309,15 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     public void requestDatabaseUpdate(){
         sendBroadcast(new Intent(BroadcastConstant.DATABASE_UPDATED));
+    }
+
+    private boolean isPermissionGranted(String permission) {
+        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean isLocationPermissionGranted() {
+        return (isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION));
     }
 
 }
