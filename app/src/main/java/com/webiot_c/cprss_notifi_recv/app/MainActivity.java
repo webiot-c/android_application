@@ -180,8 +180,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         intent.putExtra("lon", aed_Info.getLongitude());
 
         startActivity(intent);
-
-        Toast.makeText(this, ((TextView)v.findViewById(R.id.adeid)).getText(), Toast.LENGTH_LONG).show();
     }
 
 
