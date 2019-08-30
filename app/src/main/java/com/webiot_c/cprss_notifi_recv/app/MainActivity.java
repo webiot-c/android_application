@@ -1,23 +1,25 @@
 package com.webiot_c.cprss_notifi_recv.app;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -115,10 +117,62 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         NotificationUtility.deleteNotificationChannel(this);
         NotificationUtility.createNotificationChannel(this);
 
-        LocationGetter.checkLocationServicePermission(this);
+        requestPermission();
 
-        startConnectionService();
 
+    }
+
+
+    /**
+     * 指定された権限がユーザーによって許可されているかを確認する。
+     * @param permission 権限の名前
+     * @return 権限が許可されていた場合は true。
+     */
+    private boolean isPermissionGranted(String permission) {
+        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean isLocationPermissionGranted() {
+        return (isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION));
+    }
+
+    /**
+     * 位置情報関連の権限を確認する。
+     */
+    public void checkLocationServicePermission() {
+        if (!isLocationPermissionGranted()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
+        }
+    }
+
+    /**
+     * 権限をユーザーに許諾してもらえるように頑張って、ダメだったらアプリケーションを終了する。
+     */
+    public void requestPermission() {
+        if (!isLocationPermissionGranted()) {
+
+            checkLocationServicePermission();
+
+        } else {
+            startConnectionService();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1000: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startConnectionService();
+                } else {
+                    this.finish();
+                }
+            }
+        }
     }
 
     /**

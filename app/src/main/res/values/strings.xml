@@ -25,4 +25,6 @@
     <string name="notify_background">%s - Server connection</string>
     <string name="about_location">This application can know where are you to determine whether to receive notifications.\nThis application never sends the location to the outside, such as AEDs, the CPRSS Server.</string>
     <string name="apply_distance">Apply</string>
+    <string name="loc_perm_title">"Permission to get location information is needed. "</string>
+    <string name="loc_perm_context">In this application, the information to be notified is selected using the location information to obtain only the surrounding information.\nPlease allow location information acquisition in the dialog displayed on the next screen.\nIf rejected, the application will be terminated.\n</string>
 </resources>

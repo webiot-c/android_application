@@ -39,9 +39,10 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         @Override
         public void handleMessage(Message mes){
             distance = mes.what;
-            Log.e("DistanceUpdated", distance + " Km");
         }
     }
+
+    public static final String WS_SERVER_ADDRESS = "ws://cprss-notificator.herokuapp.com/";
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
@@ -63,7 +64,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     public void onCreate() {
 
         try {
-            wsclient = new CPRSS_WebSocketClient(new URI("ws://cprss-notificator.herokuapp.com/"), CPRSS_BackgroundAccessService.this );
+            wsclient = new CPRSS_WebSocketClient(new URI(WS_SERVER_ADDRESS), CPRSS_BackgroundAccessService.this );
         } catch(Exception e){
 
         }
@@ -126,7 +127,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         retryCount = 0;
-        Log.e("WS", "could access to server!");
+        Log.e("WS_SERVER_ADDRESS", "could access to server!");
     }
 
     /**
@@ -179,11 +180,15 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         if(locationGetter.getCurrentLocation() != null) {
             double req_distance = MainActivity.notification_distance;
 
-            float[] results = new float[3];
-            Location.distanceBetween(
-                    aedInfo.getLatitude(), aedInfo.getLongitude(),
-                    locationGetter.getCurrentLocation().getLatitude(), locationGetter.getCurrentLocation().getLongitude(), results);
-            if (req_distance < results[0] / 1000) return;
+            // 何も入力されていない場合、MainActivity.notification_distanceの値はInteger.MAX_VALUEになる。
+            if(req_distance != 0 && req_distance != Integer.MAX_VALUE) {
+
+                float[] results = new float[3];
+                Location.distanceBetween(
+                        aedInfo.getLatitude(), aedInfo.getLongitude(),
+                        locationGetter.getCurrentLocation().getLatitude(), locationGetter.getCurrentLocation().getLongitude(), results);
+                if (req_distance < results[0] / 1000) return;
+            }
         }
 
 
@@ -242,7 +247,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onError(Exception e) {
 
-        Log.e("CPRSS", "Error occured in WS", e);
+        Log.e("CPRSS", "Error occured in WS_SERVER_ADDRESS", e);
     }
 
 

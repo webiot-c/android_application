@@ -24,4 +24,6 @@
     <string name="notify_background">%s - サーバー通信</string>
     <string name="about_location">このアプリケーションは、通知を受信するかどうかを判断するために、位置情報を取得することが出来ます。\n取得した位置情報を、AEDやCPRSSサーバーなどの外部に送信することはありません。</string>
     <string name="apply_distance">適用</string>
+    <string name="loc_perm_context">このアプリケーションでは、周辺の情報のみを取得するために、位置情報を使用して通知するべき情報を選別します。\n次の画面に表示されるダイアログで、位置情報取得を許可してください。\n拒否された場合は、アプリケーションを終了します。</string>
+    <string name="loc_perm_title">位置情報を取得するための権限が必要です。</string>
 </resources>
