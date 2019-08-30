@@ -40,15 +40,17 @@ public class LocationGetter implements LocationListener {
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setPowerRequirement(Criteria.POWER_HIGH);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
         criteria.setSpeedRequired(true);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
         bestProvider = locationManager.getBestProvider(criteria, true);
+        Log.e("LocationGetter", "Best provider is " + bestProvider);
+
     }
     /**
      * 位置情報ブロバイダが無効になったときに呼び出される。
@@ -103,7 +105,24 @@ public class LocationGetter implements LocationListener {
     }
 
     public Location getCurrentLocation(){
+        if(!isLocationAvailable())
+            throw new IllegalStateException("位置情報が最新ではありません。");
+        else
+            return currentLocation;
+    }
+
+    /**
+     * 信頼性とかを無視して、とにかく最後に取得した位置情報を取得する。{@link LocationGetter#getCurrentLocation()}を使おう
+     * @return 最後に取得した位置情報
+     */
+    @Deprecated
+    public Location getLatestCurrentLocation(){
         return currentLocation;
+    }
+
+    public boolean isLocationAvailable(){
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
 }

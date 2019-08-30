@@ -27,4 +27,7 @@
     <string name="apply_distance">Apply</string>
     <string name="loc_perm_title">"Permission to get location information is needed. "</string>
     <string name="loc_perm_context">In this application, the information to be notified is selected using the location information to obtain only the surrounding information.\nPlease allow location information acquisition in the dialog displayed on the next screen.\nIf rejected, the application will be terminated.\n</string>
+    <string name="reconnected">The connection with the server has been restored.</string>
+    <string name="loc_permission_turnoff">Notice from %s:\nLocation permission turned off</string>
+    <string name="loc_permission_turnoff_context">The application will be terminated because processing cannot continue.\nPlease allow the location permission and restart to continue the service.</string>
 </resources>
