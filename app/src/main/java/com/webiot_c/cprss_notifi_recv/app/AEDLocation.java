@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -143,6 +145,15 @@ public class AEDLocation extends FragmentActivity implements OnMapReadyCallback 
         findViewById(R.id.map_title_bar).setBackgroundColor(backcol);
         ((TextView)findViewById(R.id.map_aed_id)).setTextColor(forecol);
 
+        findViewById(R.id.map_open_area).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String uri = String.format("geo:%f,%f?q=%f,%f&z=%f", lat, lon, lat, lon, zoom);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(intent);
+                return true;
+            }
+        });
 
     }
 

@@ -26,16 +26,30 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/map_open_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="5sp">
+        android:padding="15sp">
 
         <TextView
             android:id="@+id/map_loc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="TextView" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/mainforecolor" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/location_description" />
+
     </LinearLayout>
 
     <LinearLayout

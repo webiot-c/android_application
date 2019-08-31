@@ -31,4 +31,7 @@
     <string name="loc_permission_turnoff">Notice from %s:\nLocation permission turned off</string>
     <string name="loc_permission_turnoff_context">The application will be terminated because processing cannot continue.\nPlease allow the location permission and restart to continue the service.</string>
     <string name="location_view">AED Location Map</string>
+    <string name="list_title">Notified AEDs List</string>
+    <string name="list_description">Tap below contents to check the location of the AED.</string>
+    <string name="location_description">Long tap here to check the location via Map application.</string>
 </resources>
