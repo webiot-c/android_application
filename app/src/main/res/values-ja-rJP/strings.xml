@@ -30,4 +30,7 @@
     <string name="loc_permission_turnoff">%s からのお知らせ：\n位置情報権限がオフになりました</string>
     <string name="loc_permission_turnoff_context">サービスを続行できないため、アプリケーションを終了します。\nサービスを続行するには、位置情報権限を許可し、もう一度起動してください。</string>
     <string name="location_view">AEDの場所</string>
+    <string name="list_title">通知されたAEDリスト</string>
+    <string name="list_description">AEDの場所を確認するには、下からAEDを選んでタップしてください。</string>
+    <string name="location_description">ここを長押しすると、場所をマップアプリ上で確認できます。</string>
 </resources>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,11 +17,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
 
 import com.webiot_c.cprss_notifi_recv.DialogActivity;
 import com.webiot_c.cprss_notifi_recv.R;
+import com.webiot_c.cprss_notifi_recv.app.AEDLocation;
 import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
@@ -49,7 +52,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
     }
 
-    public static final String WS_SERVER_ADDRESS = "ws://cprss-notificator.herokuapp.com/";
+    public static final String WS_SERVER_ADDRESS = "ws://192.168.43.194:6789/";
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
@@ -234,21 +237,30 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
 
 
-        NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_AED_START,
-                this,
-                android.R.drawable.ic_dialog_info,
-                getString(R.string.notify_aed_open),
-                getString(R.string.notify_aed_open_detail),
-                getString(R.string.notify_aed_open_context));
+        int unique_id = 48971;
+
+        Intent notify_intent = new Intent(this, AEDLocation.class);
+        notify_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        notify_intent.setAction(BroadcastConstant.AED_STARTED);
+        notify_intent.putExtra("aed-id", aedInfo.getAed_id());
+        notify_intent.putExtra("lat", aedInfo.getLatitude());
+        notify_intent.putExtra("lon", aedInfo.getLongitude());
+
+        PendingIntent pi = PendingIntent.getActivity(this, 0, notify_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationUtility.NOTIFICATION_CHANNEL_AED_START)
+                .setContentIntent(pi)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(getString(R.string.notify_aed_open))
+                .setContentText(getString(R.string.notify_aed_open_detail))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.notify_aed_open_context)));
+
+        NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(unique_id, builder.build());
+
+        sendBroadcast(notify_intent);
 
         dbhelper.saveData(aedInfo);
-
-        Intent intent = new Intent();
-        intent.setAction(BroadcastConstant.AED_STARTED);
-        intent.putExtra("aed-id", aedInfo.getAed_id());
-        intent.putExtra("lat", aedInfo.getLatitude());
-        intent.putExtra("lon", aedInfo.getLongitude());
-        sendBroadcast(intent);
 
         requestDatabaseUpdate();
 
