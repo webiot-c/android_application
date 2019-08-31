@@ -13,4 +13,6 @@
     <color name="aed_enabled">@color/mainbackcolor</color>
     <color name="aed_enabled_fore">@color/mainforecolor</color>
 
+    <color name="oldAEDInfo">#9E9E9E</color>
+
 </resources>

@@ -6,24 +6,28 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String DATABASE_NAME = "AEDInfos.db";
-    private static final String TABLE_NAME = "aedinfos";
+    private static final String TABLE_NAME = "aedinfos_ver2";
+
     private static final String COLUMN_NAME_ID = "_id";
     private static final String COLUMN_NAME_ADEID = "aedinfo";
     private static final String COLUMN_NAME_LATITUDE = "lat";
     private static final String COLUMN_NAME_LONGITUDE = "lon";
+    private static final String COLUMN_NAME_RECEIVED_TIME = "time";
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + " INTEGER PRIMARY KEY," +
                     COLUMN_NAME_ADEID + " TEXT," +
                     COLUMN_NAME_LATITUDE + " REAL, " +
-                    COLUMN_NAME_LONGITUDE + " REAL) ";
+                    COLUMN_NAME_LONGITUDE + " REAL, " +
+                    COLUMN_NAME_RECEIVED_TIME + " INTEGER) ";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -70,7 +74,7 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = getReadableDatabase().query(
                 TABLE_NAME,
-                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE},
+                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE, COLUMN_NAME_RECEIVED_TIME},
                 COLUMN_NAME_ADEID + "=?", new String[]{ aed_id },
                 null, null, null
         );
@@ -84,7 +88,8 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
         aed_info = new AEDInformation(
                 cursor.getString(0),
                 cursor.getDouble(1),
-                cursor.getDouble(2)
+                cursor.getDouble(2),
+                new Date(cursor.getLong(3))
         );
 
         return aed_info;
@@ -95,8 +100,9 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = getReadableDatabase().query(
                 TABLE_NAME,
-                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE},
-                null, null, null, null, null
+                new String[] {COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE, COLUMN_NAME_RECEIVED_TIME},
+                null ,null,
+                null, null, null
         );
 
         cursor.moveToFirst();
@@ -107,7 +113,8 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
             aeds.add(new AEDInformation(
                     cursor.getString(0),
                     cursor.getDouble(1),
-                    cursor.getDouble(2)
+                    cursor.getDouble(2),
+                    new Date(cursor.getLong(3))
             ));
             cursor.moveToNext();
         }
@@ -133,15 +140,19 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
     public void saveData(AEDInformation aedInfo){
 
-        String query = String.format("INSERT INTO %s ( %s, %s, %s) VALUES ('%s', '%f', '%f')",
+        String query = String.format("INSERT INTO %s ( %s, %s, %s, %s) VALUES ('%s', '%f', '%f')",
                 TABLE_NAME,
-                COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE,
-                aedInfo.getAed_id(), aedInfo.getLatitude(), aedInfo.getLongitude());
+                COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE, COLUMN_NAME_RECEIVED_TIME,
+                aedInfo.getAed_id(), aedInfo.getLatitude(), aedInfo.getLongitude(), aedInfo.getReceivedDate().getTime());
 
         getWritableDatabase().execSQL(query);
 
     }
 
+    /**
+     * 受信日付は更新されないので注意
+     * @param aedInfo
+     */
     public void updateData(AEDInformation aedInfo){
         if(!isAlreadyRegistred(aedInfo.getAed_id()))
             throw new IllegalArgumentException("登録されていないAEDInformationをアップデートしようとしました。");

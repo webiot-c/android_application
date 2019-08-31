@@ -11,6 +11,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,8 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
             aedInfo = new AEDInformation(
                     mes_formatted[1],
                     Double.valueOf(mes_formatted[2]),
-                    Double.valueOf(mes_formatted[3])
+                    Double.valueOf(mes_formatted[3]),
+                    new Date()
             );
         } catch (NumberFormatException e){
             listener.onOtherMessage(message);
