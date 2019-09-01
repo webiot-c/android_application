@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     SharedPreferences sharedPreferences;
 
+    Thread uiUpdateThread;
+
     ////////////////////
     ///// メソッド /////
     ////////////////////
@@ -251,12 +253,47 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         updateUIProperties();
         registerBroadcastReceivers();
+
+        if(uiUpdateThread.isAlive()) uiUpdateThread.interrupt();
+
+        uiUpdateThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while(true) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateUIProperties();
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(1000 * 60);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+
+            }
+        });
+
+        uiUpdateThread.start();
+
     }
 
     @Override
     public void onPause(){
         super.onPause();
         unregisterBroadcastReceivers();
+        if(uiUpdateThread.isAlive()) uiUpdateThread.interrupt();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(uiUpdateThread.isAlive()) uiUpdateThread.interrupt();
+
     }
 
     public void updateUIProperties(){
