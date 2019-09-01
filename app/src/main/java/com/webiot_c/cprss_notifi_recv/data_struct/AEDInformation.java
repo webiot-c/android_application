@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 public class AEDInformation {
@@ -13,13 +14,15 @@ public class AEDInformation {
     private String aed_id;
     private double lat;
     private double lon;
+    private Date received_date;
 
     private long unique_id;
 
-    public AEDInformation(String aed_id, double latitude, double longitude){
+    public AEDInformation(String aed_id, double latitude, double longitude, Date received_date){
         this.aed_id = aed_id;
         this.lat = latitude;
         this.lon = longitude;
+        this.received_date = (Date)received_date.clone();
         unique_id = new Random().nextLong();
     }
 
@@ -33,6 +36,33 @@ public class AEDInformation {
 
     public double getLongitude() {
         return lon;
+    }
+
+    public void setLatitude(double lat){
+        this.lat = lat;
+    }
+
+    public void setLongitude(double lon){
+        this.lon = lon;
+    }
+
+    public Date getReceivedDate() {
+        return received_date;
+    }
+
+    public void setReceivedDate(Date received_date) {
+        this.received_date = received_date;
+    }
+
+
+    public boolean isReceivedDateInDuration(Date testDate, long durationMinute){
+        long long_aedDate = received_date.getTime();
+        long long_testDate = testDate.getTime();
+
+        long dayDiff = Math.abs(long_aedDate - long_testDate);
+
+        return (dayDiff / (1000 * 60)) <= durationMinute;
+
     }
 
     public long getUniqueID(){

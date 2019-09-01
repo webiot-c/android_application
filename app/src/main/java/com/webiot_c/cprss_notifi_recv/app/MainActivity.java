@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -157,6 +158,13 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         (new ItemTouchHelper(callback)).attachToRecyclerView(list);
 
         handler = new Handler();
+
+        ((FloatingActionButton)findViewById(R.id.updateButton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUIProperties();
+            }
+        });
 
         ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 

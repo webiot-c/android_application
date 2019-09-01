@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.webiot_c.cprss_notifi_recv.R;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAdapter.ViewHolder> {
@@ -70,6 +71,10 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
                 listener.onClick(view);
             }
         });
+
+        if(aed.isReceivedDateInDuration(new Date(), 7)){
+            holder.root.setBackgroundColor(context.getResources().getColor(R.color.oldAEDInfo));
+        }
 
     }
 
