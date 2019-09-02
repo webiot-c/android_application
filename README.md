@@ -1,6 +1,7 @@
 # android_application
 CPRSS 通知受信アプリ。配信サーバー(`webiot-c/raspi_webserver/server.py`)からWebSocketで情報を受け取り、必要に応じてユーザーへの通知を行う。<br>
-もともとprivateだったので、publicになる前までのコミットやブランチの切り方は最悪になっている。
+もともとprivateだったので、publicになる前までのコミットやブランチの切り方は最悪になっている。<br>
+なにか提案があるときは、気軽にIssueを投げてほしいです!
 
 ## UI
 - 受信した内容をメインメニューのリストに表示する。タップすると地図が表示される。<br>
@@ -33,33 +34,33 @@ WebSocketでデータ受信を行う。<br>
   - 必要ない通知が強調されるのを防ぎたい！
 
 # ファイル構造(Javaファイル)
-- app/java/com/webiot_c/cprss_notifi_recv/
-  - app/
-    - service/
+- `app/java/com/webiot_c/cprss_notifi_recv/`
+  - `app/`
+    - `service/`
       - **CPRSS_BackgroundAccessService.java**<br>
         サーバーとの通信をバックグラウンドで実施する。
     - **AEDLocationActivity.java**<br>
       AEDの場所を案内する。
     - **BroadcastReceiverManager.java**<br>
       端末の起動時と、アプリのアップデート時にサービスが消えないようにする。
-    - **MainActivity**<br>
+    - **MainActivity.java**<br>
       アプリを起動した際のActivityファイル。
-  - connect/
+  - `connect/`
     - **CPRSS_WebSocketClient.java**<br>
       サーバーからWebSocketを介して実際に情報を取得し、リスナーに通知する。
     - **CPRSS_WebSocketClientListener.java**<br>
       WebSocketの通信内容の通知を受けるリスナー。
-  - data_struct/
+  - `data_struct/`
     - **AEDInformation.java**<br>
       AEDの情報を保存するクラス。
     - **AEDInformationAdapter.java**<br>
       `AEDInformation` クラスの情報を `RecyclerView` 上で表示するためのアダプター。
-    - **AEDInformationDatabaseHelper**<br>
+    - **AEDInformationDatabaseHelper.java**<br>
       端末のデータベースとAEDInformationクラスの情報を関連付けるヘルパー。
-  - utility
-    - **LocationGetter**<br>
+  - `utility`
+    - **LocationGetter.java**<br>
       位置情報を取得する。
-    - **NotificationUtility**<br>
+    - **NotificationUtility.java**<br>
       Android端末に通知を送るためのユーティリティクラス。
   - **DialogActivity.java**<br>
     アプリケーションがアクティブでない状態でダイアログを表示するクラス。
