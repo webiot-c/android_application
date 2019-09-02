@@ -34,4 +34,5 @@
     <string name="list_title">Notified AEDs List</string>
     <string name="list_description">Tap below contents to check the location of the AED.</string>
     <string name="location_description">Long tap here to check the location via Map application.</string>
+    <string name="location_warning">The displayed position is APPROXIMATE!</string>
 </resources>

@@ -140,7 +140,7 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
 
     public void saveData(AEDInformation aedInfo){
 
-        String query = String.format("INSERT INTO %s ( %s, %s, %s, %s) VALUES ('%s', '%f', '%f')",
+        String query = String.format("INSERT INTO %s ( %s, %s, %s, %s) VALUES ('%s', '%f', '%f', '%d')",
                 TABLE_NAME,
                 COLUMN_NAME_ADEID, COLUMN_NAME_LATITUDE, COLUMN_NAME_LONGITUDE, COLUMN_NAME_RECEIVED_TIME,
                 aedInfo.getAed_id(), aedInfo.getLatitude(), aedInfo.getLongitude(), aedInfo.getReceivedDate().getTime());
@@ -161,7 +161,8 @@ public class AEDInformationDatabaseHelper extends SQLiteOpenHelper {
                 TABLE_NAME,
                 COLUMN_NAME_LATITUDE, aedInfo.getLatitude(),
                 COLUMN_NAME_LONGITUDE, aedInfo.getLongitude(),
-                COLUMN_NAME_ADEID, aedInfo.getAed_id());
+                COLUMN_NAME_ADEID, aedInfo.getAed_id(),
+                COLUMN_NAME_RECEIVED_TIME);
 
         getWritableDatabase().execSQL(query);
     }

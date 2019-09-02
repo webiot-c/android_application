@@ -20,7 +20,7 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".app.AEDLocation"
+            android:name=".app.AEDLocationActivity"
             android:label="@string/title_activity_aedlocation" />
         <activity android:name=".app.MainActivity">
             <intent-filter>

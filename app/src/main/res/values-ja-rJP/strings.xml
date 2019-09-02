@@ -33,4 +33,5 @@
     <string name="list_title">通知されたAEDリスト</string>
     <string name="list_description">AEDの場所を確認するには、下からAEDを選んでタップしてください。</string>
     <string name="location_description">ここを長押しすると、場所をマップアプリ上で確認できます。</string>
+    <string name="location_warning">表示されている内容はおおよそのものです。</string>
 </resources>

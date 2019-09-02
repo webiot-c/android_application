@@ -1,13 +1,11 @@
 package com.webiot_c.cprss_notifi_recv.app.service;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -19,11 +17,10 @@ import android.os.Messenger;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.WindowManager;
 
 import com.webiot_c.cprss_notifi_recv.DialogActivity;
 import com.webiot_c.cprss_notifi_recv.R;
-import com.webiot_c.cprss_notifi_recv.app.AEDLocation;
+import com.webiot_c.cprss_notifi_recv.app.AEDLocationActivity;
 import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
@@ -52,7 +49,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
     }
 
-    public static final String WS_SERVER_ADDRESS = "ws://192.168.43.194:6789/";
+    public static final String WS_SERVER_ADDRESS = "ws://192.168.128.100:6789/";
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
@@ -239,7 +236,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         int unique_id = 48971;
 
-        Intent notify_intent = new Intent(this, AEDLocation.class);
+        Intent notify_intent = new Intent(this, AEDLocationActivity.class);
         notify_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         notify_intent.setAction(BroadcastConstant.AED_STARTED);
         notify_intent.putExtra("aed-id", aedInfo.getAed_id());

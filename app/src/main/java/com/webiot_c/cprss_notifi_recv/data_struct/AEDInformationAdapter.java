@@ -3,6 +3,7 @@ package com.webiot_c.cprss_notifi_recv.data_struct;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +73,8 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
             }
         });
 
-        if(aed.isReceivedDateInDuration(new Date(), 7)){
+        Log.e("ReceivedDate", new Date().toString());
+        if(!aed.isReceivedDateInDuration(new Date(), 90)){
             holder.root.setBackgroundColor(context.getResources().getColor(R.color.oldAEDInfo));
         }
 

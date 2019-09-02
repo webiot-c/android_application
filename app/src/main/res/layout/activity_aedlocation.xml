@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".app.AEDLocation">
+    tools:context=".app.AEDLocationActivity">
 
     <LinearLayout
         android:id="@+id/map_title_bar"
@@ -32,6 +32,12 @@
         android:orientation="vertical"
         android:padding="15sp">
 
+        <View
+            android:id="@+id/view3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/mainforecolor" />
+
         <TextView
             android:id="@+id/map_loc"
             android:layout_width="match_parent"
@@ -43,6 +49,16 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/mainforecolor" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/location_warning"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView6"
@@ -62,7 +78,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".app.AEDLocation" />
+            tools:context=".app.AEDLocationActivity" />
     </LinearLayout>
 
 </LinearLayout>

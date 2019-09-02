@@ -1,14 +1,10 @@
 package com.webiot_c.cprss_notifi_recv.app;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -27,25 +23,21 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.app.service.CPRSS_BackgroundAccessService;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationAdapter;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
-import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
 /**
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
@@ -152,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
                 dbhelper.deleteData(deleted.getAed_id());
 
+                adapter.notifyItemRemoved(swipedPosition);
+
                 updateUIProperties();
 
             }
@@ -183,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         AEDInformation aed_Info = dbhelper.getAEDInformation(((TextView)v.findViewById(R.id.adeid)).getText().toString());
 
-        Intent intent = new Intent(this, AEDLocation.class);
+        Intent intent = new Intent(this, AEDLocationActivity.class);
         intent.putExtra("aed-id", aed_Info.getAed_id());
         intent.putExtra("lat", aed_Info.getLatitude());
         intent.putExtra("lon", aed_Info.getLongitude());
@@ -254,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         updateUIProperties();
         registerBroadcastReceivers();
 
-        if(uiUpdateThread.isAlive()) uiUpdateThread.interrupt();
+        if(uiUpdateThread != null &&uiUpdateThread.isAlive()) uiUpdateThread.interrupt();
 
         uiUpdateThread = new Thread(new Runnable() {
             @Override
@@ -269,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                     });
 
                     try {
-                        Thread.sleep(1000 * 60);
+                        Thread.sleep(1000 * 15);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -305,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         handler.post(new Runnable() {
             @Override
             public void run() {
+                adapter.notifyDataSetChanged();
                 adapter.updateList(aed_infos);
                 adapter.notifyDataSetChanged();
             }
