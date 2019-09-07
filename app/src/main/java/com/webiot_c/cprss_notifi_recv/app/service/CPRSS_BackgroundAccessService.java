@@ -193,7 +193,10 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     );
                     isDisconnedtedNoticed = true;
                     retryCount = 0;
-                    interval += 1;
+
+                    if(interval < 30)
+                        interval += 1;
+
                     Log.e("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
                 }
                 Log.e("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
