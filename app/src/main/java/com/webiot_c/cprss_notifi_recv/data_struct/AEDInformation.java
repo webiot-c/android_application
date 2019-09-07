@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.webiot_c.cprss_notifi_recv.utility.DateCompareUtility;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
@@ -57,18 +59,10 @@ public class AEDInformation {
 
 
     public boolean isReceivedDateInDuration(Date testDate, long durationSeconds){
-        long long_aedDate = received_date.getTime();
-        long long_testDate = testDate.getTime();
 
-        long dayDiff = Math.abs(long_aedDate - long_testDate);
+        long dayDiff = Math.abs(DateCompareUtility.Diff(new Date(), testDate));
 
-        Log.e("AED Duration", "AED Recv: " + received_date.toString());
-        Log.e("AED Duration", "TestData: " + testDate.toString());
-        Log.e("AED Duration", "Duration: " + durationSeconds);
-        Log.e("AED Duration", "DayDiff : " + dayDiff);
-        Log.e("AED Duration", "Compared: " + ((dayDiff / (1000)) <= durationSeconds));
-
-        return (dayDiff / (1000)) <= durationSeconds;
+        return (dayDiff / 1000) <= durationSeconds;
 
     }
 

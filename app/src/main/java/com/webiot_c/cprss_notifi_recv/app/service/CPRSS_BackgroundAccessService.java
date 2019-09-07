@@ -26,12 +26,18 @@ import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
+import com.webiot_c.cprss_notifi_recv.utility.DateCompareUtility;
 import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
 
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebSocketClientListener{
 
@@ -60,6 +66,12 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      * {@link AEDInformation}を保存するデータベースとの通信に使用する
      */
     AEDInformationDatabaseHelper dbhelper;
+
+    /**
+     * ユーザーによって無視されたAED情報のID。
+     * AED-FINISH受信時か、10分経過後に自動的に削除されるようになっている。
+     */
+    static Map<String, Date> ignoredAEDID = new HashMap<>();
 
     LocationGetter locationGetter;
 
@@ -193,7 +205,10 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     );
                     isDisconnedtedNoticed = true;
                     retryCount = 0;
-                    interval += 1;
+
+                    if(interval < 30)
+                        interval += 1;
+
                     Log.e("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
                 }
                 Log.e("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
@@ -210,12 +225,14 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     /**
      * AED使用が開始されたときに通知される。
+     * AED-OPENを受信していないノードからAED-POLLINGを受信した場合もこのメソッドが呼ばれる。
      * @param aedInfo AED情報。
      */
     @Override
     public void onAEDUseStarted(AEDInformation aedInfo) {
 
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
+        if(ignoredAEDID.containsKey(aedInfo.getAed_id())) return;
 
         Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
@@ -286,6 +303,9 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      */
     @Override
     public void onAEDUseFinished(AEDInformation aedInfo) {
+
+        ignoredAEDID.remove(aedInfo.getAed_id());
+
         NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_AED_FINISH,
                 this,
                 android.R.drawable.ic_dialog_info,
@@ -336,6 +356,30 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     public boolean isLocationPermissionGranted() {
         return (isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION) &&
                 isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION));
+    }
+
+    /**
+     * 通知が来ても無視する対象となるノードIDを登録する。
+     * @param aedid 無視対象とするノードのID。
+     */
+    public static void addIgnoreAEDID(String aedid){
+        ignoredAEDID.put(aedid, new Date());
+    }
+
+    /**
+     * 登録から10分以上経過している無視対象のノードIDを登録解除する。
+     */
+    public static void deleteExpiredIgnoreAEDID(){
+        Set<String> keys = ignoredAEDID.keySet();
+
+        for(String key : keys){
+            Date registredTime = ignoredAEDID.get(key);
+            long dayDiff_minute = DateCompareUtility.Diff(registredTime, new Date()) / 1000 / 60;
+
+            if(dayDiff_minute > 10){
+                ignoredAEDID.remove(key);
+            }
+        }
     }
 
 }
