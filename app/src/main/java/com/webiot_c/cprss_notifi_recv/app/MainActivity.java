@@ -109,10 +109,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         sharedPreferences = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
+
+        NotificationUtility.createNotificationChannel(this);
+
+        requestPermission();
+
+        setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+        setContentView(R.layout.activity_main);
 
         ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
 
@@ -164,10 +170,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
-        NotificationUtility.createNotificationChannel(this);
 
-
-        requestPermission();
 
 
     }
