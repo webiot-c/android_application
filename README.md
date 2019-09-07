@@ -24,11 +24,8 @@ WebSocketでデータ受信を行う。<br>
 |経度|即位した経度。|
 
 ## 改善したい内容
-- サーバーとの再接続のインターバルに制限をかける。
-  - 10回失敗するごとに1分、接続試行のインターバルが伸びる。理論上「10年後に接続を試行する」ということにもなってしまう！
 
-- `AED-POLLING` 受信時の挙動を修正
-  - ユーザーがリストからAEDの通知を一度削除したにも関わらずもう一度通知されてしまう！
+### UI (Issue #5)
 
 - 通知ドット(アプリアイコンの右上に出る丸)の一部無効化(Android 8以上)
   - 必要ない通知が強調されるのを防ぎたい！
@@ -52,7 +49,9 @@ WebSocketでデータ受信を行う。<br>
 
 - 最高通知距離のとこに？ボタンをつけてヘルプを表示できると良い
 
-- AEDLocationActivityの検討
+### リファクタリング
+
+- AEDLocationActivityの検討(UIかも)
   - Google Mapアプリに直接アクセスすればいいのでは?
 
 # ファイル構造(Javaファイル)
@@ -79,7 +78,7 @@ WebSocketでデータ受信を行う。<br>
       `AEDInformation` クラスの情報を `RecyclerView` 上で表示するためのアダプター。
     - **AEDInformationDatabaseHelper.java**<br>
       端末のデータベースとAEDInformationクラスの情報を関連付けるヘルパー。
-  - `utility`
+  - `utility/`
     - **LocationGetter.java**<br>
       位置情報を取得する。
     - **NotificationUtility.java**<br>
