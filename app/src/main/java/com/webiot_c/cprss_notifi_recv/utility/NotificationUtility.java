@@ -1,5 +1,6 @@
 package com.webiot_c.cprss_notifi_recv.utility;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
@@ -9,6 +10,7 @@ import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.webiot_c.cprss_notifi_recv.R;
@@ -46,15 +48,15 @@ public class NotificationUtility {
     public static final String NOTIFICATION_CHANNEL_BACKGROUND = "cprss_notifychan_background";
 
     /**
-     *  {重要度, 通知チャンネルのID, 通知音リソースID, 通知チャンネル名, 通知チャンネルの説明}
+     *  {重要度, 通知バッチ表示, 通知チャンネルのID, 通知音リソースID, 通知チャンネル名, 通知チャンネルの説明}
      *  重要度は、レベルに応じて 1～4を選択する。
      */
     public static final Object[][] NOTIFICATION_CHANNEL_INFORMATIONS = {
-            {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_LOCATION   , 0,                  "位置情報サービス関連の通知", "位置情報サービスの状態に変化が発生したときに通知されます。"},
-            {NotificationManager.IMPORTANCE_MAX     , NOTIFICATION_CHANNEL_AED_START  , R.raw.aed_started,  "AED使用開始通知",            "AEDの使用が始まったときに通知されます。"},
-            {NotificationManager.IMPORTANCE_HIGH    , NOTIFICATION_CHANNEL_AED_FINISH , R.raw.aed_finished, "AED使用終了通知",            "AEDの使用が終了したときに通知されます。"},
-            {NotificationManager.IMPORTANCE_DEFAULT , NOTIFICATION_CHANNEL_SERVER     , 0,                  "サーバー接続状態通知",       "CPRSSサーバーとの接続状態に変化が発生したときに通知します。"},
-            {NotificationManager.IMPORTANCE_LOW     , NOTIFICATION_CHANNEL_BACKGROUND , 0,                  "実行確認通知",               "このアプリケーションでは、常に通知を受信できるよう、バックグラウンドでで通信を行っています。\n通信が行われている間、この通知が表示されています。"}
+            {NotificationManager.IMPORTANCE_HIGH    , false, NOTIFICATION_CHANNEL_LOCATION   , 0,                  "位置情報サービス関連の通知", "位置情報サービスの状態に変化が発生したときに通知されます。"},
+            {NotificationManager.IMPORTANCE_MAX     , false, NOTIFICATION_CHANNEL_AED_START  , R.raw.aed_started,  "AED使用開始通知",            "AEDの使用が始まったときに通知されます。"},
+            {NotificationManager.IMPORTANCE_HIGH    , false, NOTIFICATION_CHANNEL_AED_FINISH , R.raw.aed_finished, "AED使用終了通知",            "AEDの使用が終了したときに通知されます。"},
+            {NotificationManager.IMPORTANCE_DEFAULT , false, NOTIFICATION_CHANNEL_SERVER     , 0,                  "サーバー接続状態通知",       "CPRSSサーバーとの接続状態に変化が発生したときに通知します。"},
+            {NotificationManager.IMPORTANCE_MIN     , true , NOTIFICATION_CHANNEL_BACKGROUND , 0,                  "実行確認通知",               "このアプリケーションでは、常に通知を受信できるよう、バックグラウンドでで通信を行っています。\n通信が行われている間、この通知が表示されています。"}
     };
 
 
@@ -67,7 +69,7 @@ public class NotificationUtility {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager nManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             for (Object[] channelInfo : NOTIFICATION_CHANNEL_INFORMATIONS) {
-                nManager.deleteNotificationChannel((String)channelInfo[1]);
+                nManager.deleteNotificationChannel((String)channelInfo[2]);
             }
             Toast.makeText(context.getApplicationContext(), "通知チャンネルがすべて削除されました。", Toast.LENGTH_LONG).show();
         }
@@ -82,17 +84,19 @@ public class NotificationUtility {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // NOTIFICATION_CHANNEL_INFORMATIONS のとおりにチャンネルを生成する。
             for(Object[] channelInfo : NOTIFICATION_CHANNEL_INFORMATIONS){
-                NotificationChannel channel = new NotificationChannel((String) channelInfo[1], (String) channelInfo[3], (int) channelInfo[0]);
+                NotificationChannel channel = new NotificationChannel((String) channelInfo[2], (String) channelInfo[4], (int) channelInfo[0]);
                 channel.setDescription((String)channelInfo[4]);
 
-                if((int)channelInfo[2] != 0){
+                channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                channel.setShowBadge((boolean)channelInfo[1]);
+
+                if((int)channelInfo[3] != 0){
                     AudioAttributes attr = new AudioAttributes.Builder()
                             .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .build();
-                    AssetManager act = context.getResources().getAssets();
 
-                    Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + (int)channelInfo[2]);
+                    Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + (int)channelInfo[3]);
                     channel.setSound(uri, attr);
                 }
 
