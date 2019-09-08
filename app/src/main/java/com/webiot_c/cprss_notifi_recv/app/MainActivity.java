@@ -48,7 +48,7 @@ import java.util.Arrays;
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
  * @author loxygenK
  */
-public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     ////////////////////////////////////////////
     // MainActivityに付随するBroacastReceiver //
@@ -94,8 +94,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     DatabaseUpdateReceiver databaseUpdateReceiver;
 
     Messenger mServiceMessenger;
-
-    public static float notification_distance;
 
     SharedPreferences sharedPreferences;
 
@@ -202,8 +200,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         (new ItemTouchHelper(callback)).attachToRecyclerView(list);
 
         handler = new Handler();
-
-        ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
         final SwipeRefreshLayout refresh = ((SwipeRefreshLayout)findViewById(R.id.refresh));
         Resources res = getResources();
@@ -404,37 +400,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     public void stopConnectionService(){
         // こっちはいいらしい。
         stopService(new Intent(this, CPRSS_BackgroundAccessService.class));
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
-        float distance = Float.MAX_VALUE;
-        if(s.length() > 0){
-            String raw_stsring = s.toString();
-            try {
-                distance = Float.valueOf(raw_stsring);
-            } catch (NumberFormatException e){
-                return;
-            }
-        }
-        notification_distance = distance;
-
-        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = data.edit();
-        editor.putFloat("Notification_Distance", notification_distance);
-        editor.apply();
-
     }
 
     // ----- サービス管理 ----- //
