@@ -10,6 +10,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
 
         final RecyclerView list = findViewById(R.id.list);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        final RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
         aed_infos = new ArrayList<>();
@@ -154,11 +157,41 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
                 dbhelper.deleteData(deleted.getAed_id());
 
-                adapter.notifyItemRemoved(swipedPosition);
-
                 updateUIProperties();
 
             }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+
+                    Paint p = new Paint();
+                    Drawable d = getResources().getDrawable(R.drawable.ic_delete, null);
+
+                    if (dX > 0) {
+                        p.setARGB(255, 255, 0, 0);
+                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom(), p);
+
+                        p.setARGB(255, 255, 255, 255);
+
+                        d.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + itemView.getHeight(), itemView.getBottom());
+
+                    }
+                    else {
+                        p.setARGB(255, 255, 0, 2);
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                        p.setARGB(255, 255, 255, 255);
+                        c.drawText("削除", (float) itemView.getLeft(), (float) itemView.getTop(), p);
+                        d.setBounds(itemView.getRight()  - itemView.getHeight(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    }
+
+                    d.draw(c);
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+
         };
 
         (new ItemTouchHelper(callback)).attachToRecyclerView(list);

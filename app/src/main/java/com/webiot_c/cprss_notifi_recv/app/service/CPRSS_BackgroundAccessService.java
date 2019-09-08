@@ -55,7 +55,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
     }
 
-    public static final String WS_SERVER_ADDRESS = "ws://192.168.128.100:6789/";
+    public static final String WS_SERVER_ADDRESS = "ws://192.168.10.8:6789/";
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
