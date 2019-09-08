@@ -60,7 +60,7 @@ public class AEDInformation {
 
     public boolean isReceivedDateInDuration(Date testDate, long durationSeconds){
 
-        long dayDiff = Math.abs(DateCompareUtility.Diff(new Date(), testDate));
+        long dayDiff = Math.abs(DateCompareUtility.Diff(testDate, received_date));
 
         return (dayDiff / 1000) <= durationSeconds;
 
