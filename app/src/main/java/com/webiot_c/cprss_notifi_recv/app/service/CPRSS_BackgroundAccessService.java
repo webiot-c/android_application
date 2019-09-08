@@ -231,6 +231,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onAEDUseStarted(AEDInformation aedInfo) {
 
+        Log.e("IgnoreAED", ignoredAEDID.toString());
+
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
         if(ignoredAEDID.containsKey(aedInfo.getAed_id())) return;
 
@@ -304,7 +306,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onAEDUseFinished(AEDInformation aedInfo) {
 
-        ignoredAEDID.remove(aedInfo.getAed_id());
+        deleteIgnoreAEDID(aedInfo.getAed_id());
 
         NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_AED_FINISH,
                 this,
@@ -367,17 +369,27 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     }
 
     /**
+     * 無視対象のノードIDを登録解除する。
+     * @param aedid 登録解除の対象となるノードのID
+     */
+    public static void deleteIgnoreAEDID(String aedid){
+        ignoredAEDID.remove(aedid);
+    }
+
+    /**
      * 登録から10分以上経過している無視対象のノードIDを登録解除する。
      */
     public static void deleteExpiredIgnoreAEDID(){
         Set<String> keys = ignoredAEDID.keySet();
 
+        Log.e("IgnoredAED", ignoredAEDID.toString());
+
         for(String key : keys){
             Date registredTime = ignoredAEDID.get(key);
-            long dayDiff_minute = DateCompareUtility.Diff(registredTime, new Date()) / 1000 / 60;
+            long dayDiff_minute = DateCompareUtility.Diff(new Date(), registredTime) / 1000 / 60;
 
             if(dayDiff_minute > 10){
-                ignoredAEDID.remove(key);
+                deleteIgnoreAEDID(key);
             }
         }
     }

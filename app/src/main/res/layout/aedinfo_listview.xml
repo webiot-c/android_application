@@ -20,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="aedid"
+            android:textColor="@color/aed_enabled_fore"
             android:textSize="24sp" />
 
         <TextView
@@ -28,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:text="loc"
+            android:textColor="@color/aed_enabled_fore"
             android:textSize="18sp" />
     </LinearLayout>
 

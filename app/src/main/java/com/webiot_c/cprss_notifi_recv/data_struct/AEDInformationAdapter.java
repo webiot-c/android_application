@@ -74,9 +74,21 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
         });
 
         Log.e("ReceivedDate", new Date().toString());
-        if(!aed.isReceivedDateInDuration(new Date(), 90)){
-            holder.root.setBackgroundColor(context.getResources().getColor(R.color.oldAEDInfo));
+        int backcolor = context.getResources().getColor(R.color.aedinfo_very_short);;
+
+        switch (aed.isReceivedDateInDuration(new Date(), 10, 30)) {
+            case VERY_SHORT:
+                backcolor = context.getResources().getColor(R.color.aedinfo_very_short);
+                break;
+            case FEW_LATE:
+                backcolor = context.getResources().getColor(R.color.aedinfo_few_late);
+                break;
+            case LATE:
+                backcolor = context.getResources().getColor(R.color.aedinfo_late);
+                break;
         }
+
+        holder.root.setBackgroundColor(backcolor);
 
     }
 

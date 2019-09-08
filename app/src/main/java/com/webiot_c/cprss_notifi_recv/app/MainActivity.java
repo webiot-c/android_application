@@ -157,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
                 dbhelper.deleteData(deleted.getAed_id());
 
+                CPRSS_BackgroundAccessService.addIgnoreAEDID(deleted.getAed_id());
                 updateUIProperties();
 
             }
@@ -305,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                     });
 
                     try {
-                        Thread.sleep(1000 * 15);
+                        Thread.sleep(1000 * 5);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -360,6 +361,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         findViewById(R.id.title_area).setBackgroundColor(backcol);
         ((TextView)findViewById(R.id.service_name)).setTextColor(forecol);
         ((TextView)findViewById(R.id.app_title)).setTextColor(forecol);
+
+        CPRSS_BackgroundAccessService.deleteExpiredIgnoreAEDID();
 
     }
 
