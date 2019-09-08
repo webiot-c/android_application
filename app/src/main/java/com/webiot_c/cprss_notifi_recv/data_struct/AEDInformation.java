@@ -14,6 +14,29 @@ import java.util.Random;
 
 public class AEDInformation {
 
+    /**
+     * 受信してからの時間の状態。
+     */
+    enum DurationStatus {
+
+        /**
+         * 受信してからの時間が極めて短い。
+         */
+        VERY_SHORT,
+
+        /**
+         * 受信してから少し経っている。
+         */
+        FEW_LATE,
+
+        /**
+         * かなり経っている。
+         */
+        LATE
+
+
+    }
+
     private String aed_id;
     private double lat;
     private double lon;
@@ -58,12 +81,18 @@ public class AEDInformation {
     }
 
 
-    public boolean isReceivedDateInDuration(Date testDate, long durationSeconds){
+    public DurationStatus isReceivedDateInDuration(Date testDate, long very_short, long few_late){
 
         long dayDiff = Math.abs(DateCompareUtility.Diff(testDate, received_date));
+        dayDiff = dayDiff / 1000;
 
-        return (dayDiff / 1000) <= durationSeconds;
-
+        if (dayDiff < very_short){
+            return DurationStatus.VERY_SHORT;
+        } else if(dayDiff < few_late) {
+            return DurationStatus.FEW_LATE;
+        } else {
+            return DurationStatus.LATE;
+        }
     }
 
     public long getUniqueID(){

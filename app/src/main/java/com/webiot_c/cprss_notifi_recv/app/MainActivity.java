@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                     });
 
                     try {
-                        Thread.sleep(1000 * 15);
+                        Thread.sleep(1000 * 5);
                     } catch (InterruptedException e) {
                         break;
                     }
