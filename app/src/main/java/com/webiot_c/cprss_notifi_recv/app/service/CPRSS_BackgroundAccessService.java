@@ -29,6 +29,7 @@ import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
 import com.webiot_c.cprss_notifi_recv.utility.DateCompareUtility;
 import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
+import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -103,6 +104,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
             Log.e("WSC", "Error occured in creating instance", e);
         }
         wsclient.connect();
+        PreferencesUtility.initialize(this);
     }
 
     @Override
@@ -239,7 +241,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
         if(locationGetter.getCurrentLocation() != null) {
-            double req_distance = MainActivity.notification_distance;
+            float req_distance = PreferencesUtility.getCastedFloatValue(PreferencesUtility.MAXIMUM_NOTIFICATION_RANGE, 0);
 
             // 何も入力されていない場合、MainActivity.notification_distanceの値はInteger.MAX_VALUEになる。
             if(req_distance != 0 && req_distance != Integer.MAX_VALUE) {
