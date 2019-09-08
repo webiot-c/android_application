@@ -126,8 +126,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         setContentView(R.layout.activity_main);
 
 
-        // UI設定
-        ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
+        findViewById(R.id.setting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            }
+        });
 
         final RecyclerView list = findViewById(R.id.list);
         final RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
