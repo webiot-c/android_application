@@ -166,18 +166,4 @@
 
         </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/updateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="15sp"
-        android:backgroundTint="@color/colorAccent"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="25sp"
-        android:scaleType="centerInside"
-        app:backgroundTint="@color/colorAccent"
-        app:srcCompat="@android:drawable/stat_notify_sync_noanim" />
-
 </FrameLayout>

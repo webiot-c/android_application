@@ -165,13 +165,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         handler = new Handler();
 
-        ((FloatingActionButton)findViewById(R.id.updateButton)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateUIProperties();
-            }
-        });
-
         ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
         final SwipeRefreshLayout refresh = ((SwipeRefreshLayout)findViewById(R.id.refresh));
