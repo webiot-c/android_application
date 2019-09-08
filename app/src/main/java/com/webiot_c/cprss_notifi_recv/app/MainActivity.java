@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +17,7 @@ import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
         setContentView(R.layout.activity_main);
 
+
+        // UI設定
         ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
 
         final RecyclerView list = findViewById(R.id.list);
@@ -170,7 +174,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
 
-
+        final SwipeRefreshLayout refresh = ((SwipeRefreshLayout)findViewById(R.id.refresh));
+        Resources res = getResources();
+        refresh.setColorSchemeColors(res.getColor(R.color.red), res.getColor(R.color.green), res.getColor(R.color.blue), res.getColor(R.color.yellow));
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateUIProperties();
+                refresh.setRefreshing(false);
+            }
+        });
 
 
     }
