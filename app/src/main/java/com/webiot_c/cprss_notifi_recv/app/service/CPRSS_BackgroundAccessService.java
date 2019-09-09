@@ -21,7 +21,6 @@ import android.util.Log;
 import com.webiot_c.cprss_notifi_recv.DialogActivity;
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.app.AEDLocationActivity;
-import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
@@ -34,7 +33,6 @@ import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,8 +87,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         if(!isLocationPermissionGranted()){
 
             Intent intent = new Intent(this, DialogActivity.class);
-            intent.putExtra("title", String.format(getString(R.string.loc_permission_turnoff), getString(R.string.service_name)));
-            intent.putExtra("mes", getString(R.string.loc_permission_turnoff_context));
+            intent.putExtra("title", String.format(getString(R.string.dialog_loc_permission_turnedoff), getString(R.string.common_service_name)));
+            intent.putExtra("mes", getString(R.string.dialog_loc_permission_turnedoff_context));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             isErrorOccured = true;
@@ -116,7 +114,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
             Notification notify = new Notification.Builder(CPRSS_BackgroundAccessService.this,
                     NotificationUtility.NOTIFICATION_CHANNEL_BACKGROUND)
-                            .setContentTitle(String.format(getString(R.string.notify_background), getString(R.string.app_name)))
+                            .setContentTitle(String.format(getString(R.string.notify_background), getString(R.string.common_app_name)))
                             .setSmallIcon(R.drawable.ic_server_connection)
                     .build();
 
@@ -177,8 +175,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
             NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
                     this,
                     android.R.drawable.ic_dialog_info,
-                    getString(R.string.reconnected),
-                    getString(R.string.reconnected));
+                    getString(R.string.notify_reconnected),
+                    getString(R.string.notify_reconnected));
         }
         Log.e("WebSokcet Ret.", "Accessed to server!");
     }

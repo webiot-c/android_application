@@ -54,7 +54,7 @@
             android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/location_warning"
+            android:text="@string/locationui_location_warning"
             android:textAlignment="center"
             android:textColor="@color/colorAccent"
             android:textSize="18sp"
@@ -64,7 +64,7 @@
             android:id="@+id/textView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/location_description" />
+            android:text="@string/locationui_location_description" />
 
     </LinearLayout>
 

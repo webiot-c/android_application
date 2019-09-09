@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="16dp"
-                    android:text="@string/service_name"
+                    android:text="@string/common_service_name"
                     android:textAlignment="center"
                     android:textColor="@color/noaedinfo_fore"
                     android:textSize="30dp" />
@@ -39,7 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="@string/app_title"
+                    android:text="@string/common_app_title"
                     android:textAlignment="center"
                     android:textColor="@color/noaedinfo_fore"
                     android:textSize="20dp" />
@@ -76,7 +76,7 @@
                             android:layout_height="wrap_content"
                             android:lineSpacingExtra="2sp"
                             android:padding="2sp"
-                            android:text="@string/about_location"
+                            android:text="@string/mainui_about_location"
                             android:typeface="normal" />
 
                     </LinearLayout>
@@ -99,7 +99,7 @@
                             android:id="@+id/textView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/list_title"
+                            android:text="@string/mainui_list_title"
                             android:textAlignment="viewStart"
                             android:textSize="24sp" />
 
@@ -107,7 +107,7 @@
                             android:id="@+id/textView2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/list_description" />
+                            android:text="@string/mainui_list_description" />
                     </LinearLayout>
 
                     <View

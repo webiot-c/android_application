@@ -125,7 +125,7 @@ public class AEDLocationActivity extends FragmentActivity implements OnMapReadyC
 
     public void updateUI(){
         String location = String.format(Locale.getDefault(),
-                getString(R.string.latitude) + " ／  " + getString(R.string.longitude),
+                getString(R.string.aedlist_latitude) + " ／  " + getString(R.string.aedlist_longitude),
                 lat, lon
         );
 

@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
-                android:text="@string/service_name"
+                android:text="@string/common_service_name"
                 android:textAlignment="center"
                 android:textColor="@color/noaedinfo_fore"
                 android:textSize="30dp" />
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="@string/app_title"
+                android:text="@string/common_app_title"
                 android:textAlignment="center"
                 android:textColor="@color/noaedinfo_fore"
                 android:textSize="20dp" />
