@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/set_category_notify_rule">
+
+        <EditTextPreference
+            android:defaultValue="2"
+            android:inputType="numberDecimal"
+            android:key="maximum_notification_range"
+            android:summary="2"
+            android:title="@string/set_maximum_notification_range" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/set_time_separating">
+
+        <Preference
+            android:key="describe_coloring_by_time"
+            android:title="@string/set_what_is_time_sep" />
+
+        <EditTextPreference
+            android:key="very_short_duration"
+            android:title="@string/set_very_short"
+            android:defaultValue="2"
+            android:inputType="number"
+            android:summary="2" />
+
+         <EditTextPreference
+            android:key="few_late_duration"
+            android:title="@string/set_few_late"
+            android:defaultValue="5"
+            android:inputType="number"
+            android:summary="5" />
+
+         <EditTextPreference
+            android:key="late_duration"
+            android:title="@string/set_late"
+            android:defaultValue="7"
+            android:inputType="number"
+            android:summary="7" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

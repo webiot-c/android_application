@@ -35,4 +35,11 @@
     <string name="list_description">Tap below contents to check the location of the AED.</string>
     <string name="location_description">Long tap here to check the location via Map application.</string>
     <string name="location_warning">The displayed position is APPROXIMATE!</string>
+    <string name="set_maximum_notification_range">Maximum notification range</string>
+    <string name="set_time_separating">Rules for coloring by time</string>
+    <string name="set_very_short">Duration to determine as “very short”</string>
+    <string name="set_few_late">Duration to determine as \"a little late\"</string>
+    <string name="set_late">Duration to determine as \"late\"</string>
+    <string name="set_what_is_time_sep">What is \"Coloring by time\"?</string>
+    <string name="set_category_notify_rule">Rules of notification</string>
 </resources>

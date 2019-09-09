@@ -34,4 +34,11 @@
     <string name="list_description">AEDの場所を確認するには、下からAEDを選んでタップしてください。</string>
     <string name="location_description">ここを長押しすると、場所をマップアプリ上で確認できます。</string>
     <string name="location_warning">表示されている内容はおおよそのものです。</string>
+    <string name="set_maximum_notification_range">最高通知距離</string>
+    <string name="set_time_separating">時間による色分けの基準</string>
+    <string name="set_very_short">「非常に短い」と判断するまでの時間</string>
+    <string name="set_few_late">「少し遅い」と判断するまでの時間</string>
+    <string name="set_late">「遅い」と判断するまでの時間</string>
+    <string name="set_what_is_time_sep">「時間による色分け」とは</string>
+    <string name="set_category_notify_rule">通知する基準</string>
 </resources>
