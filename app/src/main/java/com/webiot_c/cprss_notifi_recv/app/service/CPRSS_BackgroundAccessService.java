@@ -241,7 +241,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
         if(locationGetter.getCurrentLocation() != null) {
-            float req_distance = PreferencesUtility.getCastedFloatValue(PreferencesUtility.MAXIMUM_NOTIFICATION_RANGE, 0);
+            float req_distance = PreferencesUtility.getCastedFloatValue("maximum_notification_range");
 
             // 何も入力されていない場合、MainActivity.notification_distanceの値はInteger.MAX_VALUEになる。
             if(req_distance != 0 && req_distance != Integer.MAX_VALUE) {
