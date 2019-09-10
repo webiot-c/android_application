@@ -20,7 +20,7 @@
     <string name="notify_aed_close_detail">AED使用が終了しました。ご協力ありがとうございました。</string>
     <string name="common_app_title">通知受信アプリ</string>
     <string name="notify_background">%s - サーバー通信</string>
-    <string name="mainui_about_location">このアプリケーションは、通知を受信するかどうかを判断するために、位置情報を取得することが出来ます。\n取得した位置情報を、AEDやCPRSSサーバーなどの外部に送信することはありません。</string>
+    <string name="about_location">このアプリケーションは、通知を受信するかどうかを判断するために、位置情報を取得することが出来ます。\n取得した位置情報を、AEDやCPRSSサーバーなどの外部に送信することはありません。</string>
     <string name="dialog_loc_perm_context">このアプリケーションでは、周辺の情報のみを取得するために、位置情報を使用して通知するべき情報を選別します。\n次の画面に表示されるダイアログで、位置情報取得を許可してください。\n拒否された場合は、アプリケーションを終了します。</string>
     <string name="dialog_loc_perm_title">位置情報を取得するための権限が必要です。</string>
     <string name="notify_reconnected">サーバーとの接続が復帰しました。</string>
@@ -70,4 +70,6 @@
         ]]>
     </string>
     <string name="mainui_setting">タップして設定画面へ</string>
+    <string name="set_about_this_service">このサービスについて</string>
+    <string name="set_about_location">位置情報について</string>
 </resources>

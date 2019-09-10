@@ -58,6 +58,20 @@ public class SettingActivityFragment extends PreferenceFragment implements Prefe
             }
         });
 
+        findPreference("set_location").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingActivityFragment.this.getActivity(), HelpActivity.class);
+                intent.putExtra(HelpActivity.HELP_TITLE, getString(R.string.set_about_location));
+                intent.putExtra(HelpActivity.GIF_RESOURCE, R.raw.describe_mnr);
+                intent.putExtra(HelpActivity.HELP_CONTEXT, getString(R.string.about_location));
+
+                startActivity(intent);
+                return true;
+            }
+        });
+
     }
 
     @Override
