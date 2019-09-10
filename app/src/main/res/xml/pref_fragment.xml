@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/set_category_notify_rule">
 
+        <Preference
+            android:key="help_rules_of_notification"
+            android:title="@string/help_maximum_notify_range" />
+
         <EditTextPreference
             android:defaultValue="2"
             android:inputType="numberDecimal"
@@ -14,7 +18,7 @@
         android:title="@string/set_time_separating">
 
         <Preference
-            android:key="describe_coloring_by_time"
+            android:key="help_coloring_by_time"
             android:title="@string/set_what_is_time_sep" />
 
         <EditTextPreference
