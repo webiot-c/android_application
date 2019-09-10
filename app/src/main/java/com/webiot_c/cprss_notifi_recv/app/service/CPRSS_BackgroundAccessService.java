@@ -21,7 +21,6 @@ import android.util.Log;
 import com.webiot_c.cprss_notifi_recv.DialogActivity;
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.app.AEDLocationActivity;
-import com.webiot_c.cprss_notifi_recv.app.MainActivity;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClient;
 import com.webiot_c.cprss_notifi_recv.connect.CPRSS_WebSocketClientListener;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
@@ -29,11 +28,11 @@ import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
 import com.webiot_c.cprss_notifi_recv.utility.DateCompareUtility;
 import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
+import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
     }
 
-    public static final String WS_SERVER_ADDRESS = "ws://192.168.128.100:6789/";
+    public static final String WS_SERVER_ADDRESS = "ws://192.168.10.8:6789/";
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
@@ -88,8 +87,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         if(!isLocationPermissionGranted()){
 
             Intent intent = new Intent(this, DialogActivity.class);
-            intent.putExtra("title", String.format(getString(R.string.loc_permission_turnoff), getString(R.string.service_name)));
-            intent.putExtra("mes", getString(R.string.loc_permission_turnoff_context));
+            intent.putExtra("title", String.format(getString(R.string.dialog_loc_permission_turnedoff), getString(R.string.common_service_name)));
+            intent.putExtra("mes", getString(R.string.dialog_loc_permission_turnedoff_context));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             isErrorOccured = true;
@@ -103,6 +102,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
             Log.e("WSC", "Error occured in creating instance", e);
         }
         wsclient.connect();
+        PreferencesUtility.initialize(this);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
             Notification notify = new Notification.Builder(CPRSS_BackgroundAccessService.this,
                     NotificationUtility.NOTIFICATION_CHANNEL_BACKGROUND)
-                            .setContentTitle(String.format(getString(R.string.notify_background), getString(R.string.app_name)))
+                            .setContentTitle(String.format(getString(R.string.notify_background), getString(R.string.common_app_name)))
                             .setSmallIcon(R.drawable.ic_server_connection)
                     .build();
 
@@ -175,8 +175,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
             NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
                     this,
                     android.R.drawable.ic_dialog_info,
-                    getString(R.string.reconnected),
-                    getString(R.string.reconnected));
+                    getString(R.string.notify_reconnected),
+                    getString(R.string.notify_reconnected));
         }
         Log.e("WebSokcet Ret.", "Accessed to server!");
     }
@@ -231,13 +231,15 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onAEDUseStarted(AEDInformation aedInfo) {
 
+        Log.e("IgnoreAED", ignoredAEDID.toString());
+
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
         if(ignoredAEDID.containsKey(aedInfo.getAed_id())) return;
 
         Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
         if(locationGetter.getCurrentLocation() != null) {
-            double req_distance = MainActivity.notification_distance;
+            float req_distance = PreferencesUtility.getCastedFloatValue("maximum_notification_range");
 
             // 何も入力されていない場合、MainActivity.notification_distanceの値はInteger.MAX_VALUEになる。
             if(req_distance != 0 && req_distance != Integer.MAX_VALUE) {
@@ -304,7 +306,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onAEDUseFinished(AEDInformation aedInfo) {
 
-        ignoredAEDID.remove(aedInfo.getAed_id());
+        deleteIgnoreAEDID(aedInfo.getAed_id());
 
         NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_AED_FINISH,
                 this,
@@ -367,17 +369,27 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     }
 
     /**
+     * 無視対象のノードIDを登録解除する。
+     * @param aedid 登録解除の対象となるノードのID
+     */
+    public static void deleteIgnoreAEDID(String aedid){
+        ignoredAEDID.remove(aedid);
+    }
+
+    /**
      * 登録から10分以上経過している無視対象のノードIDを登録解除する。
      */
     public static void deleteExpiredIgnoreAEDID(){
         Set<String> keys = ignoredAEDID.keySet();
 
+        Log.e("IgnoredAED", ignoredAEDID.toString());
+
         for(String key : keys){
             Date registredTime = ignoredAEDID.get(key);
-            long dayDiff_minute = DateCompareUtility.Diff(registredTime, new Date()) / 1000 / 60;
+            long dayDiff_minute = DateCompareUtility.Diff(new Date(), registredTime) / 1000 / 60;
 
             if(dayDiff_minute > 10){
-                ignoredAEDID.remove(key);
+                deleteIgnoreAEDID(key);
             }
         }
     }

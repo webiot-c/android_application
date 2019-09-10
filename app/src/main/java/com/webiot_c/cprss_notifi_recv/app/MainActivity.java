@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +20,7 @@ import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,7 +48,7 @@ import java.util.Arrays;
  * アプロケーションを起動したときに表示される最初の画面の挙動を記述する。
  * @author loxygenK
  */
-public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     ////////////////////////////////////////////
     // MainActivityに付随するBroacastReceiver //
@@ -90,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
     Messenger mServiceMessenger;
 
-    public static float notification_distance;
-
     SharedPreferences sharedPreferences;
 
     Thread uiUpdateThread;
@@ -109,15 +112,27 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         sharedPreferences = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
 
-        ((EditText) findViewById(R.id.dist)).setText(String.valueOf(sharedPreferences.getFloat("Notification_Distance", 0)));
+        NotificationUtility.createNotificationChannel(this);
+
+        requestPermission();
+
+        setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+        setContentView(R.layout.activity_main);
+
+
+        findViewById(R.id.mainui_setting_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            }
+        });
 
         final RecyclerView list = findViewById(R.id.list);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        final RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 
         aed_infos = new ArrayList<>();
@@ -144,30 +159,58 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
                 dbhelper.deleteData(deleted.getAed_id());
 
-                adapter.notifyItemRemoved(swipedPosition);
-
+                CPRSS_BackgroundAccessService.addIgnoreAEDID(deleted.getAed_id());
                 updateUIProperties();
 
             }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+
+                    Paint p = new Paint();
+                    Drawable d = getResources().getDrawable(R.drawable.ic_delete, null);
+
+                    if (dX > 0) {
+                        p.setARGB(255, 255, 0, 0);
+                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom(), p);
+
+                        p.setARGB(255, 255, 255, 255);
+
+                        d.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + itemView.getHeight(), itemView.getBottom());
+
+                    }
+                    else {
+                        p.setARGB(255, 255, 0, 2);
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                        p.setARGB(255, 255, 255, 255);
+                        c.drawText("削除", (float) itemView.getLeft(), (float) itemView.getTop(), p);
+                        d.setBounds(itemView.getRight()  - itemView.getHeight(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    }
+
+                    d.draw(c);
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+
         };
 
         (new ItemTouchHelper(callback)).attachToRecyclerView(list);
 
         handler = new Handler();
 
-        ((FloatingActionButton)findViewById(R.id.updateButton)).setOnClickListener(new View.OnClickListener() {
+        final SwipeRefreshLayout refresh = ((SwipeRefreshLayout)findViewById(R.id.refresh));
+        Resources res = getResources();
+        refresh.setColorSchemeColors(res.getColor(R.color.red), res.getColor(R.color.green), res.getColor(R.color.blue), res.getColor(R.color.yellow));
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
+            public void onRefresh() {
                 updateUIProperties();
+                refresh.setRefreshing(false);
             }
         });
-
-        ((EditText) findViewById(R.id.dist)).addTextChangedListener(this);
-
-        NotificationUtility.createNotificationChannel(this);
-
-
-        requestPermission();
 
 
     }
@@ -263,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
                     });
 
                     try {
-                        Thread.sleep(1000 * 15);
+                        Thread.sleep(1000 * 5);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -319,6 +362,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         ((TextView)findViewById(R.id.service_name)).setTextColor(forecol);
         ((TextView)findViewById(R.id.app_title)).setTextColor(forecol);
 
+        CPRSS_BackgroundAccessService.deleteExpiredIgnoreAEDID();
+
     }
 
 
@@ -355,37 +400,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     public void stopConnectionService(){
         // こっちはいいらしい。
         stopService(new Intent(this, CPRSS_BackgroundAccessService.class));
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
-        float distance = Float.MAX_VALUE;
-        if(s.length() > 0){
-            String raw_stsring = s.toString();
-            try {
-                distance = Float.valueOf(raw_stsring);
-            } catch (NumberFormatException e){
-                return;
-            }
-        }
-        notification_distance = distance;
-
-        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = data.edit();
-        editor.putFloat("Notification_Distance", notification_distance);
-        editor.apply();
-
     }
 
     // ----- サービス管理 ----- //

@@ -13,6 +13,15 @@
     <color name="aed_enabled">@color/mainbackcolor</color>
     <color name="aed_enabled_fore">@color/mainforecolor</color>
 
-    <color name="oldAEDInfo">#9E9E9E</color>
+    <color name="aedinfo_very_short">#5433A7</color>
+    <color name="aedinfo_few_late">#A50000</color>
+    <color name="aedinfo_late">#535353</color>
+
+    <color name="red">#ff0000</color>
+    <color name="green">#009900</color>
+    <color name="blue">#0000ff</color>
+    <color name="yellow">#FFE600</color>
+
+    <color name="otherUI">#85CDFF</color>
 
 </resources>

@@ -58,7 +58,7 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
         AEDInformation aed = dataset.get(position);
 
         String location = String.format(Locale.getDefault(),
-                context.getString(R.string.latitude) + " ／  " + context.getString(R.string.longitude),
+                context.getString(R.string.aedlist_latitude) + " ／  " + context.getString(R.string.aedlist_longitude),
                 aed.getLatitude(),
                 aed.getLongitude()
         );
@@ -74,9 +74,21 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
         });
 
         Log.e("ReceivedDate", new Date().toString());
-        if(!aed.isReceivedDateInDuration(new Date(), 90)){
-            holder.root.setBackgroundColor(context.getResources().getColor(R.color.oldAEDInfo));
+        int backcolor = context.getResources().getColor(R.color.aedinfo_very_short);;
+
+        switch (aed.isReceivedDateInDuration(new Date(), 10, 30)) {
+            case VERY_SHORT:
+                backcolor = context.getResources().getColor(R.color.aedinfo_very_short);
+                break;
+            case FEW_LATE:
+                backcolor = context.getResources().getColor(R.color.aedinfo_few_late);
+                break;
+            case LATE:
+                backcolor = context.getResources().getColor(R.color.aedinfo_late);
+                break;
         }
+
+        holder.root.setBackgroundColor(backcolor);
 
     }
 
