@@ -22,4 +22,6 @@
     <color name="blue">#0000ff</color>
     <color name="yellow">#FFE600</color>
 
+    <color name="otherUI">#85CDFF</color>
+
 </resources>
