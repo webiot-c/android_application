@@ -16,28 +16,18 @@
             android:id="@+id/title_area"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/noaedinfo"
-            android:orientation="vertical">
+            android:background="@color/otherUI"
+            android:orientation="vertical"
+            android:padding="15dp">
 
             <TextView
                 android:id="@+id/service_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
-                android:text="@string/common_service_name"
+                android:text="@string/set_title"
                 android:textAlignment="center"
                 android:textColor="@color/noaedinfo_fore"
-                android:textSize="30dp" />
-
-            <TextView
-                android:id="@+id/app_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/common_app_title"
-                android:textAlignment="center"
-                android:textColor="@color/noaedinfo_fore"
-                android:textSize="20dp" />
+                android:textSize="30sp" />
 
         </LinearLayout>
 

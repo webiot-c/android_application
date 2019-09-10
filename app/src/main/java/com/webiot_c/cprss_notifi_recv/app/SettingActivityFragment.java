@@ -1,10 +1,12 @@
 package com.webiot_c.cprss_notifi_recv.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
+import com.webiot_c.cprss_notifi_recv.HelpActivity;
 import com.webiot_c.cprss_notifi_recv.R;
 import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 
@@ -23,7 +25,38 @@ public class SettingActivityFragment extends PreferenceFragment implements Prefe
             etp.setSummary(pinfo.getFormattedText(this.getResources(), etp.getText()));
         }
 
-        findPreference("");
+        findPreference("help_rules_of_notification").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingActivityFragment.this.getActivity(), HelpActivity.class);
+                intent.putExtra(HelpActivity.HELP_TITLE, getString(R.string.help_maximum_notify_range));
+                intent.putExtra(HelpActivity.GIF_RESOURCE, R.raw.describe_mnr);
+                intent.putExtra(HelpActivity.HELP_CONTEXT, getString(R.string.help_maximum_notify_range_context));
+
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        findPreference("help_coloring_by_time").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                int very_fast = PreferencesUtility.getCastedIntValue(PreferencesUtility.VERY_SHORT_DURATION);
+                int few_late = PreferencesUtility.getCastedIntValue(PreferencesUtility.FEW_LATE_DURATION);
+                int late = PreferencesUtility.getCastedIntValue(PreferencesUtility.LATE_DURATION);
+                String context = String.format(getString(R.string.help_coloring_by_time_context), very_fast, few_late, late);
+
+                Intent intent = new Intent(SettingActivityFragment.this.getActivity(), HelpActivity.class);
+                intent.putExtra(HelpActivity.HELP_TITLE, getString(R.string.set_what_is_time_sep));
+                intent.putExtra(HelpActivity.GIF_RESOURCE, R.raw.describing_60);
+                intent.putExtra(HelpActivity.HELP_CONTEXT, context);
+
+                startActivity(intent);
+                return true;
+            }
+        });
 
     }
 
