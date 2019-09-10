@@ -69,4 +69,5 @@
         However, it is not recommended because you will receive all notifications regardless of distance. <br>
         ]]>
     </string>
+    <string name="mainui_setting">Tap to move to settings screen</string>
 </resources>
