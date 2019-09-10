@@ -1,13 +1,11 @@
 <resources>
-    <string name="app_name">CPRSS Notification Receiver</string>
-    <string name="service_name" translatable="false">CPRSS</string>
-    <string name="latitude">Latitude: %f</string>
-    <string name="longitude">Longitude: %f</string>
-    <string name="notifyDist">Minimum distance to notify</string>
-    <string name="unlocate">No location information yet.</string>
-    <string name="locservice_outofservice">You are in out of service area of location service!</string>
-    <string name="locservice_temp">Location information is temporarily unavailable.</string>
-    <string name="locservice_unknown">The status of location information is unknown.</string>
+    <string name="common_app_name">CPRSS Notification Receiver</string>
+    <string name="common_service_name" translatable="false">CPRSS</string>
+    <string name="aedlist_latitude">Latitude: %f</string>
+    <string name="aedlist_longitude">Longitude: %f</string>
+    <string name="locstatus_outofservice">You are in out of service area of location service!</string>
+    <string name="locstatus_temp">Location information is temporarily unavailable.</string>
+    <string name="locstatus_unknown">The status of location information is unknown.</string>
     <string name="notify_locservice_disable">Location service has been disabled.</string>
     <string name="notify_locservice_disabled_detail">We\'ll receive all notifications, regardless of location.\nTo discard far notifications, please enable the location service.</string>
     <string name="notify_locservice_enabled">Location service has been enabled now.</string>
@@ -20,19 +18,55 @@
     <string name="notify_aed_open_context">Need support for lifesaving within the set range\nPlease cooperate with lifesaving!\nTap to check the location.</string>
     <string name="notify_aed_close">AED operation has been finished.</string>
     <string name="notify_aed_close_detail">No further lifesaving support is required. Thank you very much to your cooperation.</string>
-    <string name="app_title">Notification Receiver</string>
-    <string name="title_activity_aedlocation" translatable="false">Map</string>
+    <string name="common_app_title">Notification Receiver</string>
+    <string name="manifest_act_title_aedlocation" translatable="false">Map</string>
     <string name="notify_background">%s - Server connection</string>
-    <string name="about_location">This application can know where are you to determine whether to receive notifications.\nThis application never sends the location to the outside, such as AEDs, the CPRSS Server.</string>
-    <string name="apply_distance">Apply</string>
-    <string name="loc_perm_title">"Permission to get location information is needed. "</string>
-    <string name="loc_perm_context">In this application, the information to be notified is selected using the location information to obtain only the surrounding information.\nPlease allow location information acquisition in the dialog displayed on the next screen.\nIf rejected, the application will be terminated.\n</string>
-    <string name="reconnected">The connection with the server has been restored.</string>
-    <string name="loc_permission_turnoff">Notice from %s:\nLocation permission turned off</string>
-    <string name="loc_permission_turnoff_context">The application will be terminated because processing cannot continue.\nPlease allow the location permission and restart to continue the service.</string>
-    <string name="location_view">AED Location Map</string>
-    <string name="list_title">Notified AEDs List</string>
-    <string name="list_description">Tap below contents to check the location of the AED.</string>
-    <string name="location_description">Long tap here to check the location via Map application.</string>
-    <string name="location_warning">The displayed position is APPROXIMATE!</string>
+    <string name="mainui_about_location">This application can know where are you to determine whether to receive notifications.\nThis application never sends the location to the outside, such as AEDs, the CPRSS Server.</string>
+    <string name="dialog_loc_perm_title">"Permission to get location information is needed. "</string>
+    <string name="dialog_loc_perm_context">In this application, the information to be notified is selected using the location information to obtain only the surrounding information.\nPlease allow location information acquisition in the dialog displayed on the next screen.\nIf rejected, the application will be terminated.\n</string>
+    <string name="notify_reconnected">The connection with the server has been restored.</string>
+    <string name="dialog_loc_permission_turnedoff">Notice from %s:\nLocation permission turned off</string>
+    <string name="dialog_loc_permission_turnedoff_context">The application will be terminated because processing cannot continue.\nPlease allow the location permission and restart to continue the service.</string>
+    <string name="mainui_list_title">Notified AEDs List</string>
+    <string name="mainui_list_description">Tap below contents to check the location of the AED.</string>
+    <string name="locationui_location_description">Long tap here to check the location via Map application.</string>
+    <string name="locationui_location_warning">The displayed position is APPROXIMATE!</string>
+    <string name="set_maximum_notification_range">Maximum notification range</string>
+    <string name="set_time_separating">Rules for coloring by time</string>
+    <string name="set_very_short">Duration to determine as “Very short”</string>
+    <string name="set_few_late">Duration to determine as \"A little late\"</string>
+    <string name="set_late">Duration to determine as \"Late\"</string>
+    <string name="set_what_is_time_sep">What is \"Coloring by time?\"</string>
+    <string name="set_category_notify_rule">Rules of notification</string>
+    <string name="help_coloring_by_time_context">
+        <![CDATA[
+        After time passed after we received notifications, the colors of lists change.
+        This is to decide the priority of notification based on the time passed after notification.<br>
+        Colors change in the following step:<br>
+        <br>
+        <b><font color="#5433a7">[ Very short ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#5433a7">Changes into the purple.</span></font> The same as 1st color in the above picture.<br>
+        　Lifesaving from now might be very effective.<br>
+        <br>
+        <b><font color="#a50000">[ A little late ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#a50000">Changes into the red.</span></font> The same as 2nd color in the above picture.<br>
+        　A little time passed after received notification, but lifesaving may be helpful.<br>
+        <br>
+        <b><font color="#535353">[ Late ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#535353">Changes into the gray.</span></font> The same as 3rd color in the above picture.<br>
+        　 The ambulance may have arrived and the patient may have been transported already.<br>
+        <br>
+        ]]>
+    </string>
+    <string name="set_title">Settings</string>
+    <string name="help_maximum_notify_range">What is \"Maximum notification range?\"</string>
+    <string name="help_maximum_notify_range_context">
+        <![CDATA[
+        You can block notifications that occur far away. <br>
+        This will allow you to see only the notifications that you can support lifesaving. <br>
+        <br>
+        Setting “0Km” disables this block function. <br>
+        However, it is not recommended because you will receive all notifications regardless of distance. <br>
+        ]]>
+    </string>
 </resources>

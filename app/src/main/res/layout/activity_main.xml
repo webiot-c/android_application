@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +7,17 @@
     tools:context=".app.MainActivity">
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+        <LinearLayout
                 android:id="@+id/title_area"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -24,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="16dp"
-                    android:text="@string/service_name"
+                    android:text="@string/common_service_name"
                     android:textAlignment="center"
                     android:textColor="@color/noaedinfo_fore"
                     android:textSize="30dp" />
@@ -34,7 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="@string/app_title"
+                    android:text="@string/common_app_title"
                     android:textAlignment="center"
                     android:textColor="@color/noaedinfo_fore"
                     android:textSize="20dp" />
@@ -55,43 +60,6 @@
                     android:orientation="vertical"
                     android:padding="15dp">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
-
-                            <EditText
-                                android:id="@+id/dist"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:ems="10"
-                                android:importantForAutofill="no"
-                                android:inputType="number|numberDecimal"
-                                android:textAlignment="textEnd" />
-
-                            <TextView
-                                android:id="@+id/textView4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="@string/notifyDist" />
-
-                            <TextView
-                                android:id="@+id/textView5"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Km" />
-
-                        </LinearLayout>
-                    </LinearLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -108,7 +76,7 @@
                             android:layout_height="wrap_content"
                             android:lineSpacingExtra="2sp"
                             android:padding="2sp"
-                            android:text="@string/about_location"
+                            android:text="@string/mainui_about_location"
                             android:typeface="normal" />
 
                     </LinearLayout>
@@ -131,7 +99,7 @@
                             android:id="@+id/textView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/list_title"
+                            android:text="@string/mainui_list_title"
                             android:textAlignment="viewStart"
                             android:textSize="24sp" />
 
@@ -139,7 +107,7 @@
                             android:id="@+id/textView2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/list_description" />
+                            android:text="@string/mainui_list_description" />
                     </LinearLayout>
 
                     <View
@@ -164,6 +132,21 @@
             </android.support.v4.widget.SwipeRefreshLayout>
 
 
-        </LinearLayout>
+    </LinearLayout>
 
-</FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:clickable="true"
+        android:padding="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.98"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98"
+        app:srcCompat="@android:drawable/stat_sys_download_done" />
+
+</android.support.constraint.ConstraintLayout>

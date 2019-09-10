@@ -58,7 +58,7 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
         AEDInformation aed = dataset.get(position);
 
         String location = String.format(Locale.getDefault(),
-                context.getString(R.string.latitude) + " ／  " + context.getString(R.string.longitude),
+                context.getString(R.string.aedlist_latitude) + " ／  " + context.getString(R.string.aedlist_longitude),
                 aed.getLatitude(),
                 aed.getLongitude()
         );
