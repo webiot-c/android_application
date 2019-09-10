@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.webiot_c.cprss_notifi_recv">
-
+    <!-- サーバーとの通信に必要な権限 -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/SplashTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".app.SettingsActivity"></activity>
+        <activity android:name=".HelpActivity"></activity>
+        <activity android:name=".app.SettingsActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -30,13 +31,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".DialogActivity"
             android:label=""
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:launchMode="singleInstance">
-        </activity>
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -52,13 +51,13 @@
         <service
             android:name=".app.service.CPRSS_BackgroundAccessService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-    </application> <!-- サーバーとの通信に必要な権限 -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    </application>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
