@@ -33,9 +33,40 @@
     <string name="locationui_location_warning">The displayed position is APPROXIMATE!</string>
     <string name="set_maximum_notification_range">Maximum notification range</string>
     <string name="set_time_separating">Rules for coloring by time</string>
-    <string name="set_very_short">Duration to determine as “very short”</string>
-    <string name="set_few_late">Duration to determine as \"a little late\"</string>
-    <string name="set_late">Duration to determine as \"late\"</string>
-    <string name="set_what_is_time_sep">What is \"Coloring by time\"?</string>
+    <string name="set_very_short">Duration to determine as “Very short”</string>
+    <string name="set_few_late">Duration to determine as \"A little late\"</string>
+    <string name="set_late">Duration to determine as \"Late\"</string>
+    <string name="set_what_is_time_sep">What is \"Coloring by time?\"</string>
     <string name="set_category_notify_rule">Rules of notification</string>
+    <string name="help_coloring_by_time_context">
+        <![CDATA[
+        After time passed after we received notifications, the colors of lists change.
+        This is to decide the priority of notification based on the time passed after notification.<br>
+        Colors change in the following step:<br>
+        <br>
+        <b><font color="#5433a7">[ Very short ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#5433a7">Changes into the purple.</span></font> The same as 1st color in the above picture.<br>
+        　Lifesaving from now might be very effective.<br>
+        <br>
+        <b><font color="#a50000">[ A little late ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#a50000">Changes into the red.</span></font> The same as 2nd color in the above picture.<br>
+        　A little time passed after received notification, but lifesaving may be helpful.<br>
+        <br>
+        <b><font color="#535353">[ Late ]  %d minutes after received a notification</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#535353">Changes into the gray.</span></font> The same as 3rd color in the above picture.<br>
+        　 The ambulance may have arrived and the patient may have been transported already.<br>
+        <br>
+        ]]>
+    </string>
+    <string name="set_title">Settings</string>
+    <string name="help_maximum_notify_range">What is \"Maximum notification range?\"</string>
+    <string name="help_maximum_notify_range_context">
+        <![CDATA[
+        You can block notifications that occur far away. <br>
+        This will allow you to see only the notifications that you can support lifesaving. <br>
+        <br>
+        Setting “0Km” disables this block function. <br>
+        However, it is not recommended because you will receive all notifications regardless of distance. <br>
+        ]]>
+    </string>
 </resources>

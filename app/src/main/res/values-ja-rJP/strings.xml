@@ -37,4 +37,36 @@
     <string name="set_late">「遅い」と判断するまでの時間</string>
     <string name="set_what_is_time_sep">「時間による色分け」とは</string>
     <string name="set_category_notify_rule">通知する基準</string>
+    <string name="help_coloring_by_time_context">
+        <![CDATA[
+        AEDの使用が通知されてから時間が経つと、リストの色が変化します。
+        これは、通知の優先度を、通知されてからの時間によって区別するためです。
+        色は、以下のように変化します。<br>
+        <br>
+        <b><font color="#5433a7">【非常に短い】 通知を受けてから時間が%d分以内</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#5433a7">紫色です。</span></font>上の動画の1番目の色です。<br>
+        　今からの救助は十分に効果があると思われます。<br>
+        　<br>
+        <b><font color="#a50000">【少し遅い】 通知を受けてから時間が%d分以内</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#a50000">赤色です。</span></font>上の動画の2番目の色です。<br>
+        　通知されてから少し時間が経っていますが、まだ間に合う可能性があります。<br>
+        <br>
+        <b><font color="#535353">【遅い】 通知を受けてから時間が%d分以内</b></font><br>
+        　<font color="#dddddd"><span style="background-color:#535353">灰色です。</span></font>上の動画の3番目の色です。<br>
+        　すでに救急隊が到着し、搬送された可能性があります(7分以上の場合)。<br>
+        <br>
+        ]]>
+    </string>
+    <string name="set_title">設定</string>
+    <string name="help_maximum_notify_range">「最高通知距離」とは</string>
+    <string name="help_maximum_notify_range_context">
+        <![CDATA[
+        遠くで発生した通知をブロックすることができます。<br>
+        これによって、自分が応援に迎える通知のみを表示することができるようになります。<br>
+        <br>
+        「0Km」と設定すると、ブロック機能を無効にすることが出来ます。<br>
+        ただし、距離に関わらず全ての通知を受信するため、推奨されません。<br>
+        <br>
+        ]]>
+    </string>
 </resources>
