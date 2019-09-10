@@ -57,7 +57,7 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/mainui_seting_button"
+                    android:id="@+id/mainui_setting_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/otherUI"
