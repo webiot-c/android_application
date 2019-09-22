@@ -55,6 +55,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     }
 
     public static final String WS_SERVER_ADDRESS = "ws://192.168.10.8:6789/";
+    public static final int SERVICE_FOREGROUND_NITIFICATION_ID = 3281236;
+
+    public static final int SERVER_CONNECTION_FAILED     = 0b100;
+    public static final int SERVER_CONNECTION_TEMP_ERROR = 0b010;
+    public static final int LOCATION_SERVICE_DISABLED    = 0b001;
 
     /**
      * CPRSSのWebサーバーと通信するときに使うクライアント。
@@ -72,6 +77,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      */
     static Map<String, Date> ignoredAEDID = new HashMap<>();
 
+    /**
+     * サーバー接続失敗 サーバー再試行 位置情報エラー
+     */
+    static int service_status = 0b000;
+
     LocationGetter locationGetter;
 
     Messenger mServiceMessenger = new Messenger( new ActivityMessageReceiver());
@@ -79,6 +89,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     int distance;
 
     boolean isErrorOccured = false;
+
 
     @Override
     public void onCreate() {
@@ -108,17 +119,21 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        NotificationManager notifyman = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(CPRSS_BackgroundAccessService.this,
+                NotificationUtility.NOTIFICATION_CHANNEL_BACKGROUND)
+                .setSubText(getString(R.string.notify_background))
+                .setSmallIcon(R.drawable.ic_server_connection)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.notify_service_fine)));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            NotificationManager notifyman = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            Notification notify = new Notification.Builder(CPRSS_BackgroundAccessService.this,
-                    NotificationUtility.NOTIFICATION_CHANNEL_BACKGROUND)
-                            .setContentTitle(String.format(getString(R.string.notify_background), getString(R.string.common_app_name)))
-                            .setSmallIcon(R.drawable.ic_server_connection)
-                    .build();
-
-            startForeground(1, notify);
+            startForeground(SERVICE_FOREGROUND_NITIFICATION_ID, builder.build());
+        } else {
+            builder.setContentTitle(getString(R.string.common_app_name) + " - " + getString(R.string.notify_background));
+            Notification notify = builder.build();
+            notify.flags = Notification.FLAG_NO_CLEAR;
+            notifyman.notify(SERVICE_FOREGROUND_NITIFICATION_ID, notify);
         }
 
         if(isErrorOccured){
@@ -179,6 +194,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     getString(R.string.notify_reconnected));
         }
         Log.e("WebSokcet Ret.", "Accessed to server!");
+        CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                CPRSS_BackgroundAccessService.SERVER_CONNECTION_TEMP_ERROR, false);
+
+        CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                CPRSS_BackgroundAccessService.SERVER_CONNECTION_FAILED, false);
     }
 
     /**
@@ -194,7 +214,15 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(retryCount > 10 && !isDisconnedtedNoticed){
+
+                CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                        CPRSS_BackgroundAccessService.SERVER_CONNECTION_TEMP_ERROR, true);
+
+                if(retryCount > 1 && !isDisconnedtedNoticed){
+
+                    CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                            CPRSS_BackgroundAccessService.SERVER_CONNECTION_FAILED, true);
+
                     NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
                             CPRSS_BackgroundAccessService.this,
                             android.R.drawable.ic_dialog_alert,
@@ -209,9 +237,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     if(interval < 30)
                         interval += 1;
 
-                    Log.e("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
+                    Log.w("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
                 }
-                Log.e("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
+
+                Log.i("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
+                Log.i("WebSocket Ret.", "Current interval is " + interval + ".");
                 try{
                     Thread.sleep(500 + (1000 * 60 * interval));
                 } catch (InterruptedException e) {
@@ -392,6 +422,31 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                 deleteIgnoreAEDID(key);
             }
         }
+    }
+
+    public static void updateStatus(Context context, int code, boolean status){
+
+        if(status){
+            service_status |= code;
+        } else {
+            service_status &= ~code;
+        }
+
+        Log.w("StatusCode", "Status changed: " + service_status);
+
+        String statusMessage = "";
+        if((service_status & SERVER_CONNECTION_FAILED) != 0){
+            statusMessage = context.getString(R.string.notify_service_server_failed);
+        } else if ((service_status & SERVER_CONNECTION_TEMP_ERROR) != 0) {
+            statusMessage = context.getString(R.string.notify_service_server_temporality);
+        } else if ((service_status & LOCATION_SERVICE_DISABLED) != 0) {
+            statusMessage = context.getString(R.string.notify_service_location_disable);
+        } else {
+            statusMessage = context.getString(R.string.notify_service_fine);
+        }
+
+        NotificationUtility.updateServiceNotification(context, statusMessage);
+
     }
 
 }
