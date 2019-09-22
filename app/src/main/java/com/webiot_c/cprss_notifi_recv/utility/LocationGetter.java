@@ -1,7 +1,9 @@
 package com.webiot_c.cprss_notifi_recv.utility;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -13,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.webiot_c.cprss_notifi_recv.R;
+import com.webiot_c.cprss_notifi_recv.app.service.CPRSS_BackgroundAccessService;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -49,7 +52,7 @@ public class LocationGetter implements LocationListener {
         criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
         bestProvider = locationManager.getBestProvider(criteria, true);
-        Log.e("LocationGetter", "Best provider is " + bestProvider);
+        Log.v("LocationGetter", "Best provider is " + bestProvider);
 
     }
     /**
@@ -58,11 +61,7 @@ public class LocationGetter implements LocationListener {
      */
     @Override
     public void onProviderDisabled(String provider) {
-        NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_LOCATION,
-                context,
-                android.R.drawable.ic_dialog_info,
-                context.getString(R.string.notify_locservice_disable),
-                context.getString(R.string.notify_locservice_disabled_detail));
+        CPRSS_BackgroundAccessService.updateStatus(context, CPRSS_BackgroundAccessService.LOCATION_SERVICE_DISABLED, true);
     }
 
     /**
@@ -71,16 +70,13 @@ public class LocationGetter implements LocationListener {
      */
     @Override
     public void onProviderEnabled(String provider) {
-        NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_LOCATION,
-                context,
-                android.R.drawable.ic_dialog_info,
-                context.getString(R.string.notify_locservice_enabled),
-                context.getString(R.string.notify_locservice_enabled_detail));
+        CPRSS_BackgroundAccessService.updateStatus(context, CPRSS_BackgroundAccessService.LOCATION_SERVICE_DISABLED, false);
     }
 
     /**
      * 位置情報の取得を開始する。
      */
+    @SuppressLint("MissingPermission") // ← 権限はこのメソッドが呼び出される前に保障されている。。
     public void startUpdateLocation() {
         locationManager.requestLocationUpdates(bestProvider, 60000, 3, this);
     }
@@ -95,10 +91,11 @@ public class LocationGetter implements LocationListener {
     // ----- 位置情報関連 ----- //
     @Override
     public void onLocationChanged(Location location) {
-        Log.e("LocationCHanged", "Location is now changed.");
+        Log.v("LocationCHanged", "Location is now changed.");
         currentLocation = location;
     }
 
+    /* API29 からは呼び出されない */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 

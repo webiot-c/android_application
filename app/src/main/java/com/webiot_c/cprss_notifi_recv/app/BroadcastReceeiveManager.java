@@ -12,7 +12,7 @@ public class BroadcastReceeiveManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e("Recv", intent.getAction());
+        Log.d("Recv", intent.getAction());
         if(isBootCompleted(context, intent) || isApplicationUpdated(context, intent)){
             Intent service_intent = new Intent(context, CPRSS_BackgroundAccessService.class);
 

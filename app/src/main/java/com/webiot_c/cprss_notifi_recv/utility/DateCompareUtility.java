@@ -18,10 +18,6 @@ public class DateCompareUtility {
 
         long dayDiff = long_aedDate - long_testDate;
 
-        Log.e("AED Duration", "[A]: " + a.toString());
-        Log.e("AED Duration", "[B]: " + b.toString());
-        Log.e("AED Duration", "Dif: " + dayDiff);
-
         return dayDiff;
 
     }

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.webiot_c.cprss_notifi_recv.R;
+import com.webiot_c.cprss_notifi_recv.app.service.CPRSS_BackgroundAccessService;
 
 public class NotificationUtility {
 
@@ -141,6 +142,25 @@ public class NotificationUtility {
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(unique_id, builder.build());
+
+    }
+
+    /**
+     * 常時表示される通知の内容を変更する。
+     * @param context 変更を行うcontext.
+     * @param status メッセージ。
+     */
+    public static void updateServiceNotification(Context context, String status){
+
+        NotificationManager notifyman = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
+                NotificationUtility.NOTIFICATION_CHANNEL_BACKGROUND)
+                .setSubText(context.getString(R.string.notify_background))
+                .setSmallIcon(R.drawable.ic_server_connection)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(status));
+
+        notifyman.notify(CPRSS_BackgroundAccessService.SERVICE_FOREGROUND_NITIFICATION_ID, builder.build());
 
     }
 
