@@ -108,9 +108,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         try {
             wsclient = new CPRSS_WebSocketClient(new URI(WS_SERVER_ADDRESS), CPRSS_BackgroundAccessService.this, this );
-            Log.e("WSC", ( wsclient == null ? null : wsclient.toString()));
         } catch(Exception e){
-            Log.e("WSC", "Error occured in creating instance", e);
         }
         wsclient.connect();
         PreferencesUtility.initialize(this);
@@ -193,7 +191,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                     getString(R.string.notify_reconnected),
                     getString(R.string.notify_reconnected));
         }
-        Log.e("WebSokcet Ret.", "Accessed to server!");
+        Log.i("WebSokcet Ret.", "Accessed to server!");
         CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
                 CPRSS_BackgroundAccessService.SERVER_CONNECTION_TEMP_ERROR, false);
 
@@ -260,13 +258,12 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      */
     @Override
     public void onAEDUseStarted(AEDInformation aedInfo) {
-
-        Log.e("IgnoreAED", ignoredAEDID.toString());
+        Log.i("AED Event", "New AED information reserved.");
+        Log.d("IgnoreAED", ignoredAEDID.toString());
 
         if(dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) return;
         if(ignoredAEDID.containsKey(aedInfo.getAed_id())) return;
 
-        Log.e("Current", (locationGetter.getCurrentLocation() == null ? "null" : locationGetter.getCurrentLocation().toString()));
         // 距離で識別する
         if(locationGetter.getCurrentLocation() != null) {
             float req_distance = PreferencesUtility.getCastedFloatValue("maximum_notification_range");
@@ -315,7 +312,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onAEDLocationUpdated(AEDInformation aedInfo){
 
-        Log.e("AEDLocationUpdateLis", aedInfo.toString());
+        Log.i("AEDLocationUpdateLis", aedInfo.toString());
         dbhelper.updateData(aedInfo);
 
         Intent intent = new Intent();
@@ -362,7 +359,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      */
     @Override
     public void onOtherMessage(String message) {
-        Log.e("CPRSS", "Unparsed Message: " + message);
+        Log.d("CPRSS", "Unparsed Message: " + message);
 
     }
 
@@ -373,7 +370,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     @Override
     public void onError(Exception e) {
 
-        Log.e("CPRSS", "Error occured in WS_SERVER_ADDRESS", e);
+        Log.w("CPRSS", "Error occured in WS_SERVER_ADDRESS", e);
     }
 
 
@@ -412,13 +409,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     public static void deleteExpiredIgnoreAEDID(){
         Set<String> keys = ignoredAEDID.keySet();
 
-        Log.e("IgnoredAED", ignoredAEDID.toString());
-
         for(String key : keys){
             Date registredTime = ignoredAEDID.get(key);
             long dayDiff_minute = DateCompareUtility.Diff(new Date(), registredTime) / 1000 / 60;
 
-            if(dayDiff_minute > 10){
+            if(dayDiff_minute > 10) {
                 deleteIgnoreAEDID(key);
             }
         }
@@ -432,7 +427,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
             service_status &= ~code;
         }
 
-        Log.w("StatusCode", "Status changed: " + service_status);
+        Log.i("StatusCode", "Status changed: " + service_status);
 
         String statusMessage = "";
         if((service_status & SERVER_CONNECTION_FAILED) != 0){

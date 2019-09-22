@@ -52,7 +52,7 @@ public class LocationGetter implements LocationListener {
         criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
         bestProvider = locationManager.getBestProvider(criteria, true);
-        Log.e("LocationGetter", "Best provider is " + bestProvider);
+        Log.v("LocationGetter", "Best provider is " + bestProvider);
 
     }
     /**
@@ -91,7 +91,7 @@ public class LocationGetter implements LocationListener {
     // ----- 位置情報関連 ----- //
     @Override
     public void onLocationChanged(Location location) {
-        Log.e("LocationCHanged", "Location is now changed.");
+        Log.v("LocationCHanged", "Location is now changed.");
         currentLocation = location;
     }
 

@@ -29,7 +29,6 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
         super(uri);
         this.listener = listener;
         dbhelper = AEDInformationDatabaseHelper.getInstance(context);
-        Log.e("CPRSS_WSC", "New instance!");
     }
 
     @Override
@@ -39,7 +38,7 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        Log.e("WSC", message);
+        Log.d("WSC", message);
         String[] mes_formatted = message.split("#");
         if(mes_formatted.length != 4){
             listener.onOtherMessage(message);
@@ -65,10 +64,10 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
 
             case "AED-POLLING":
                 if(!dbhelper.isAlreadyRegistred(aedInfo.getAed_id())) {
-                    Log.e("WSC", "Missed aed data! UseStarted will be called.");
+                    Log.i("WSC", "Received Missed aed data! UseStarted will be called.");
                     listener.onAEDUseStarted(aedInfo);
                 } else {
-                    Log.e("WSC", "Location update: " + aedInfo.toString());
+                    Log.i("WSC", "Location update: " + aedInfo.toString());
                     listener.onAEDLocationUpdated(aedInfo);
                 }
                 break;

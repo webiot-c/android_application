@@ -73,7 +73,6 @@ public class AEDInformationAdapter extends RecyclerView.Adapter<AEDInformationAd
             }
         });
 
-        Log.e("ReceivedDate", new Date().toString());
         int backcolor = context.getResources().getColor(R.color.aedinfo_very_short);;
 
         switch (aed.isReceivedDateInDuration(new Date(), 10, 30)) {
