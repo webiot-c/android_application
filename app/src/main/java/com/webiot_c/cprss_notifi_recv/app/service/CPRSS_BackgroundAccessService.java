@@ -30,6 +30,7 @@ import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
 import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
@@ -148,6 +149,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     @Override
     public void onDestroy() {
+        try {
+            wsclient.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.onDestroy();
     }
 

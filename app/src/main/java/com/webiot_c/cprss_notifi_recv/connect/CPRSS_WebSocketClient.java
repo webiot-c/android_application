@@ -7,6 +7,7 @@ import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
 
 import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
@@ -31,10 +32,9 @@ public class CPRSS_WebSocketClient {
     AEDInformationDatabaseHelper dbhelper;
 
     WebSocketContainer container;
-
     URI uri_info;
 
-
+    Session currentSession = null;
 
     public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener) throws IOException, DeploymentException {
         this(uri, listener, null);
@@ -57,7 +57,7 @@ public class CPRSS_WebSocketClient {
 
                 container = ContainerProvider.getWebSocketContainer();
                 try {
-                    container.connectToServer(wrapped_this, uri_info);
+                    currentSession = container.connectToServer(wrapped_this, uri_info);
                 } catch (DeploymentException | IOException e) {
                     Log.e("WS Connection", "Error occured when trying to connect.", e);
                     listener.onClose(null);
@@ -65,6 +65,13 @@ public class CPRSS_WebSocketClient {
 
             }
         }).start();
+    }
+
+    public void disconnect() throws IOException {
+        if(currentSession != null){
+            CloseReason cr = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Android side service have been terminated.");
+            currentSession.close(cr);
+        }
     }
 
     @OnOpen
