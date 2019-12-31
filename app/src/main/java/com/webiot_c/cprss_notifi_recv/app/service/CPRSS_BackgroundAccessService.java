@@ -30,13 +30,13 @@ import com.webiot_c.cprss_notifi_recv.utility.LocationGetter;
 import com.webiot_c.cprss_notifi_recv.utility.NotificationUtility;
 import com.webiot_c.cprss_notifi_recv.utility.PreferencesUtility;
 
-import org.java_websocket.handshake.ServerHandshake;
-
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.websocket.Session;
 
 public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebSocketClientListener{
 
@@ -54,7 +54,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         }
     }
 
-    public static final String WS_SERVER_ADDRESS = "ws://192.168.10.8:6789/";
+    public static final String WS_SERVER_ADDRESS = "ws://192.168.10.9:6789/";
     public static final int SERVICE_FOREGROUND_NITIFICATION_ID = 3281236;
 
     public static final int SERVER_CONNECTION_FAILED     = 0b100;
@@ -109,8 +109,8 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
         try {
             wsclient = new CPRSS_WebSocketClient(new URI(WS_SERVER_ADDRESS), CPRSS_BackgroundAccessService.this, this );
         } catch(Exception e){
+            Log.e("WSC Error!", "Exception occured:", e);
         }
-        wsclient.connect();
         PreferencesUtility.initialize(this);
     }
 
@@ -141,10 +141,6 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
         dbhelper = AEDInformationDatabaseHelper.getInstance(getApplicationContext());
         locationGetter = new LocationGetter(this);
-
-        if (wsclient.isClosed()){
-            wsclient.reconnect();
-        }
 
         return Service.START_STICKY;
     }
@@ -178,10 +174,10 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
 
     /**
      * サーバーとの接続に成功したときに呼び出される。
-     * @param handshakedata 接続成功に関する詳しい情報。
+     * @param session 開かれたWSセッション。
      */
     @Override
-    public void onOpen(ServerHandshake handshakedata) {
+    public void onOpen(Session session) {
         retryCount = 0;
         if(isDisconnedtedNoticed){
             isDisconnedtedNoticed = false;
@@ -202,53 +198,11 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
     /**
      * サーバーとの接続が切断されたときに呼び出される。
      * 処理としては、10回接続を試行し、失敗した場合は通知を送信して、しばらく時間を置いてから試行する。
-     * @param code 切断された理由。
-     * @param reason 切断された理由。
-     * @param remote サーバー側から切断された理由は True。
+     * @param session 閉ざされたセッション
      */
     @Override
-    public void onClose(int code, String reason, boolean remote) {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
-                        CPRSS_BackgroundAccessService.SERVER_CONNECTION_TEMP_ERROR, true);
-
-                if(retryCount > 1 && !isDisconnedtedNoticed){
-
-                    CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
-                            CPRSS_BackgroundAccessService.SERVER_CONNECTION_FAILED, true);
-
-                    NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
-                            CPRSS_BackgroundAccessService.this,
-                            android.R.drawable.ic_dialog_alert,
-                            getString(R.string.notify_disconnected),
-                            getString(R.string.notify_disconnection_detail),
-                            getString(R.string.notify_disconnection_detail) + "\n" +
-                            getString(R.string.notify_disconnected_context)
-                    );
-                    isDisconnedtedNoticed = true;
-                    retryCount = 0;
-
-                    if(interval < 30)
-                        interval += 1;
-
-                    Log.w("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
-                }
-
-                Log.i("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
-                Log.i("WebSocket Ret.", "Current interval is " + interval + ".");
-                try{
-                    Thread.sleep(500 + (1000 * 60 * interval));
-                } catch (InterruptedException e) {
-                    Log.e("WebSocket Ret.", "Couldn't wait enough time due to interruption.");
-                }
-                wsclient.reconnect();
-                retryCount++;
-            }
-        }).start();
+    public void onClose(Session session) {
+        // TODO: Re-connection.
     }
 
     /**
@@ -368,7 +322,7 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
      * @param e 発生した例外
      */
     @Override
-    public void onError(Exception e) {
+    public void onError(Throwable e) {
 
         Log.w("CPRSS", "Error occured in WS_SERVER_ADDRESS", e);
     }

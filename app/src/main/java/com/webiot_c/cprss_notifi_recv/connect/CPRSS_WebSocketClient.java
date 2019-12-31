@@ -6,37 +6,67 @@ import android.util.Log;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformation;
 import com.webiot_c.cprss_notifi_recv.data_struct.AEDInformationDatabaseHelper;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
+import javax.websocket.ClientEndpoint;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CPRSS_WebSocketClient extends WebSocketClient {
+@ClientEndpoint
+public class CPRSS_WebSocketClient {
 
     CPRSS_WebSocketClientListener listener;
 
     AEDInformationDatabaseHelper dbhelper;
 
-    public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener){
+    public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener) throws IOException, DeploymentException {
         this(uri, listener, null);
     }
 
-    public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener, Context context){
-        super(uri);
+    public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener, Context context) throws IOException, DeploymentException {
+
+        final URI uri_info = uri;
+
+        final CPRSS_WebSocketClient wrapped_this = this;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+                try {
+                    container.connectToServer(wrapped_this, uri_info);
+                } catch (DeploymentException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
         this.listener = listener;
         dbhelper = AEDInformationDatabaseHelper.getInstance(context);
     }
 
-    @Override
-    public void onOpen(ServerHandshake handshakedata) {
-        listener.onOpen(handshakedata);
+    @OnOpen
+    public void onOpen(Session session) {
+        Log.d("WSC", "Websocket Session Opened!");
+        listener.onOpen(session);
     }
 
-    @Override
+    @OnMessage
     public void onMessage(String message) {
         Log.d("WSC", message);
         String[] mes_formatted = message.split("#");
@@ -81,13 +111,13 @@ public class CPRSS_WebSocketClient extends WebSocketClient {
 
     }
 
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
-        listener.onClose(code, reason, remote);
+    @OnClose
+    public void onClose(Session session) {
+        listener.onClose(session);
     }
 
-    @Override
-    public void onError(Exception ex) {
+    @OnError
+    public void onError(Throwable ex) {
         listener.onError(ex);
     }
 }
