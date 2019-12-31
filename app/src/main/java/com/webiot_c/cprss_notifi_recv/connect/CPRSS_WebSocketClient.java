@@ -30,34 +30,41 @@ public class CPRSS_WebSocketClient {
 
     AEDInformationDatabaseHelper dbhelper;
 
+    WebSocketContainer container;
+
+    URI uri_info;
+
+
+
     public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener) throws IOException, DeploymentException {
         this(uri, listener, null);
     }
 
     public CPRSS_WebSocketClient(URI uri, CPRSS_WebSocketClientListener listener, Context context) throws IOException, DeploymentException {
 
-        final URI uri_info = uri;
+        uri_info = uri;
+        this.listener = listener;
+        reconnect();
 
+        dbhelper = AEDInformationDatabaseHelper.getInstance(context);
+    }
+
+    public void reconnect(){
         final CPRSS_WebSocketClient wrapped_this = this;
-
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-                WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+                container = ContainerProvider.getWebSocketContainer();
                 try {
                     container.connectToServer(wrapped_this, uri_info);
-                } catch (DeploymentException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (DeploymentException | IOException e) {
+                    Log.e("WS Connection", "Error occured when trying to connect.", e);
+                    listener.onClose(null);
                 }
 
             }
         }).start();
-
-        this.listener = listener;
-        dbhelper = AEDInformationDatabaseHelper.getInstance(context);
     }
 
     @OnOpen

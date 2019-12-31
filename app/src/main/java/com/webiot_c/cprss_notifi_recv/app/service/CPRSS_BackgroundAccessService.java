@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebSocketClientListener{
 
@@ -195,14 +196,65 @@ public class CPRSS_BackgroundAccessService extends Service implements CPRSS_WebS
                 CPRSS_BackgroundAccessService.SERVER_CONNECTION_FAILED, false);
     }
 
+    boolean reconnectBlock = false;
+
     /**
      * サーバーとの接続が切断されたときに呼び出される。
      * 処理としては、10回接続を試行し、失敗した場合は通知を送信して、しばらく時間を置いてから試行する。
      * @param session 閉ざされたセッション
      */
     @Override
-    public void onClose(Session session) {
-        // TODO: Re-connection.
+    public void onClose(final Session session) {
+        // FIX: Unstable behavior!
+
+        while(reconnectBlock){}
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                        CPRSS_BackgroundAccessService.SERVER_CONNECTION_TEMP_ERROR, true);
+
+                if(retryCount > 1 && !isDisconnedtedNoticed){
+
+                    CPRSS_BackgroundAccessService.updateStatus(CPRSS_BackgroundAccessService.this,
+                            CPRSS_BackgroundAccessService.SERVER_CONNECTION_FAILED, true);
+
+                    NotificationUtility.notify(NotificationUtility.NOTIFICATION_CHANNEL_SERVER,
+                            CPRSS_BackgroundAccessService.this,
+                            android.R.drawable.ic_dialog_alert,
+                            getString(R.string.notify_disconnected),
+                            getString(R.string.notify_disconnection_detail),
+                            getString(R.string.notify_disconnection_detail) + "\n" +
+                                    getString(R.string.notify_disconnected_context)
+                    );
+                    isDisconnedtedNoticed = true;
+                    retryCount = 0;
+
+                    if(interval < 30)
+                        interval += 1;
+
+                    Log.w("WebSocket Ret.", "Server seems temporally unavailable. Wait for " + ((500 + (1000 * 60 * interval)) / 1000.0) + "seconds.");
+                }
+
+                reconnectBlock = true;
+
+                Log.i("WebSocket Ret.", "Cannot access to server! trying. attempt " + String.valueOf(retryCount + 1) + "/10");
+                Log.i("WebSocket Ret.", "Current interval is " + interval + ".");
+                try{
+                    Thread.sleep(500 + (1000 * 60 * interval));
+                } catch (InterruptedException e) {
+                    Log.e("WebSocket Ret.", "Couldn't wait enough time due to interruption.");
+                }
+
+
+                wsclient.reconnect();
+                retryCount++;
+
+                reconnectBlock = false;
+
+            }
+        }).start();
     }
 
     /**
